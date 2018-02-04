@@ -1,0 +1,13 @@
+.ant-menu.ant-menu-dark .ant-menu-item-selected,
+.ant-menu-submenu-popup.ant-menu-dark .ant-menu-item-selected {
+    background: transparent;
+}
+
+.ant-menu.ant-menu-dark .ant-menu-item-selected>.anticon {
+    font-size: 28px;
+}
+
+.ant-menu-inline-collapsed>.ant-menu-item {
+    padding: 0 !important;
+    text-align: center;
+}
