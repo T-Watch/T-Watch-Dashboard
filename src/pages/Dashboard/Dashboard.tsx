@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { Layout, Menu, Icon, Avatar, Row, Col, List } from 'antd';
-import { Card, InboxMessage, TrainingSummary } from './components';
-import { InboxMessageProps } from './components/InboxMessage/InboxMessage';
-import './App.css';
+import { Row, Col, List } from 'antd';
+import { Card, InboxMessage, TrainingSummary } from '../../components';
+import { InboxMessageProps } from '../../components/InboxMessage/InboxMessage';
 
 const fakeMessages: InboxMessageProps[] = [{
   from: 'Brais',
@@ -37,38 +36,9 @@ const lastTraining = {
   ]
 };
 
-class App extends React.Component {
+class Dashboard extends React.Component {
   render() {
     return (
-      <Layout style={{ height: '100vh' }}>
-        <Layout.Sider collapsed={true} style={{ boxShadow: '3px 0 5px -2px #888' }}>
-          <Menu theme="dark" mode="inline" defaultSelectedKeys={['dashboard']} className="sider-menu">
-            <Menu.Item key="user">
-              <Avatar icon="user" />
-            </Menu.Item>
-            <Menu.Item key="dashboard">
-              <Icon type="dashboard" />
-              <span>Dashboard</span>
-            </Menu.Item>
-            <Menu.Item key="trainings">
-              <Icon type="solution" />
-              <span>Trainings</span>
-            </Menu.Item>
-            <Menu.Item key="customers">
-              <Icon type="team" />
-              <span>Customers</span>
-            </Menu.Item>
-            <Menu.Item key="calendar">
-              <Icon type="calendar" />
-              <span>Calendar</span>
-            </Menu.Item>
-            <Menu.Item key="billing">
-              <Icon type="credit-card" />
-              <span>Billing</span>
-            </Menu.Item>
-          </Menu>
-        </Layout.Sider>
-        <Layout.Content style={{ margin: '16px' }}>
           <Row gutter={40}>
             <Col className="gutter-row" span={8}>
               <Card title="Inbox" icon="inbox" >
@@ -94,10 +64,8 @@ class App extends React.Component {
               </Card>
             </Col>
           </Row>
-        </Layout.Content>
-      </Layout>
     );
   }
 }
 
-export default App;
+export default Dashboard;
