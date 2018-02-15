@@ -27,6 +27,9 @@ module.exports = {
       index: '/public/'
     },
     inline: true,
+    proxy: {
+      "/graphql": "http://localhost:3001"
+    }
   },
 
   // tell Webpack to load TypeScript files
@@ -48,7 +51,7 @@ module.exports = {
   module: {
     rules: [{
       test: /\.ts(x?)$/,
-      exclude: [ /node_modules/, /meteor-client.js/ ],
+      exclude: [ /node_modules/, /dist/ ],
       use: [{
         loader: 'babel-loader',
         options: {
@@ -62,12 +65,15 @@ module.exports = {
         }
       },
       {
-        loader: 'ts-loader'
+        loader: 'ts-loader',
+        options: {
+          "transpileOnly": true
+        }
       }
       ]
     }, {
       test: /\.js$/,
-      exclude: [ /node_modules/, /meteor-client.js/ ],
+      exclude: [ /node_modules/, /dist/ ],
       use: [{
         loader: 'babel-loader',
         options: {
