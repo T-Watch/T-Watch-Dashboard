@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Avatar, Icon } from 'antd';
-import { LineChart, Line, CartesianGrid } from 'recharts';
+import { LineChart, Line, CartesianGrid, XAxis, ResponsiveContainer } from 'recharts';
 import * as Utils from '../../Utils';
 
 export interface TrainingSummaryProps {
@@ -49,10 +49,13 @@ class TrainingSummary extends React.Component<TrainingSummaryProps, {}> {
           </span>
         </div>
         <div style={{ display: 'flex', justifyContent: 'center', marginTop: 25 }}>
-          <LineChart width={300} height={100} data={this.props.data}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <Line type="monotone" dataKey="pv" stroke="#4286f4" strokeWidth={2} />
-          </LineChart>
+          <ResponsiveContainer width="100%" height={100}>
+            <LineChart data={this.props.data}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="amt" />
+              <Line type="monotone" dataKey="pv" stroke="#4286f4" strokeWidth={2} />
+            </LineChart>
+          </ResponsiveContainer>
         </div>
       </div>
     );
