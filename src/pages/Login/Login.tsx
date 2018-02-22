@@ -3,10 +3,12 @@ import { Form, Icon, Input, Button, Checkbox } from 'antd';
 import './Login.css';
 const FormItem = Form.Item;
 
-interface LoginProps {
+interface Props {
+  submit: Function;
   form: any;
 }
-class Login extends React.Component<LoginProps, {}> {
+
+class Login extends React.Component<Props, {}> {
 
   public render() {
     const { getFieldDecorator } = this.props.form;
@@ -47,12 +49,25 @@ class Login extends React.Component<LoginProps, {}> {
     );
   }
 
-  private handleSubmit = (e: any) => {
+  private handleSubmit = async (e: any) => {
     e.preventDefault();
     this.props.form.validateFields((err: any, values: any) => {
       if (!err) {
         delete values.remember;
-        console.debug('Received values of form: ', values);
+        this.props.submit(
+          values,
+          (s: string) => {
+            this.props.form.setFields({
+              email: {
+                value: values.email,
+                errors: [new Error(s)],
+              },
+              password: {
+                value: values.password,
+                errors: [new Error(s)],
+              },
+            });
+          });
       }
     });
   }

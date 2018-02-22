@@ -1,14 +1,20 @@
 import * as React from 'react';
+import { withApollo } from 'react-apollo';
+import { gql } from 'apollo-boost';
 import { Layout, Menu, Icon, Avatar } from 'antd';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
 import './App.css';
 
+interface ApolloProps {
+  client: any;
+}
+
 interface State {
   page: string;
 }
 
-class App extends React.Component<{}, State> {
+class App extends React.Component<ApolloProps, State> {
   state: State = {
     page: 'dashboard'
   };
@@ -17,7 +23,28 @@ class App extends React.Component<{}, State> {
     if (!localStorage.getItem('token')) {
       return (
         <Layout style={{ height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <Login />
+          <Login
+            submit={async (args: any, onError: Function) => {
+              try {
+                const { data } = await this.props.client.query({
+                  query: gql`query Query($email: String!, $password: String!) {
+                    token(email: $email, password: $password){
+                      error
+                      token
+                    }
+                  }`,
+                  variables: args
+                });
+                if (data.token.error) {
+                  throw new Error(data.token.error);
+                }
+                localStorage.setItem('token', data.token.token);
+                this.forceUpdate();
+              } catch (e) {
+                onError(e.message);
+              }
+            }}
+          />
         </Layout>
       );
     }
@@ -63,4 +90,4 @@ class App extends React.Component<{}, State> {
   }
 }
 
-export default App;
+export default withApollo<{}, State>(App);
