@@ -2,6 +2,7 @@ import * as React from 'react';
 import { withApollo, Query } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { Layout, Menu, Icon, Avatar } from 'antd';
+import Trainings from './Trainings';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
 import './App.css';
@@ -23,6 +24,10 @@ const userQuery = gql`
     trainings (coach: $email) @include(if: $coach) {
       registryDate
     }
+    users (coach: $email) {
+      name
+      email
+    }
   }
 `;
 
@@ -32,7 +37,7 @@ class App extends React.Component<ApolloProps, State> {
   };
 
   public render() {
-    console.log("App rendered");
+    console.log('App rendered');
     const login = (
       <Login
         submit={async (args: any, onError: Function) => {
@@ -61,6 +66,14 @@ class App extends React.Component<ApolloProps, State> {
     );
     if (!localStorage.getItem('token')) {
       return login;
+    }
+    let page = <Dashboard />;
+    switch (this.state.page) {
+      case 'trainings':
+        page = <Trainings />;
+        break;
+      default:
+        break;
     }
     return (
       <Query
@@ -117,7 +130,7 @@ class App extends React.Component<ApolloProps, State> {
                   </Menu>
                 </Layout.Sider>
                 <Layout.Content style={{ margin: '16px' }}>
-                  <Dashboard />
+                  {page}
                 </Layout.Content>
               </Layout>
             );
