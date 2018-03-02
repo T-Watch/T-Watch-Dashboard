@@ -58,10 +58,15 @@ class App extends React.Component<ApolloProps, State> {
         case 'trainings':
           page = <Trainings />;
           break;
+        case 'logout':
+          localStorage.removeItem('token');
+          localStorage.removeItem('email');
+          localStorage.removeItem('email');
+          return <Login redirect={() => this.forceUpdate()} />;
         default:
           break;
       }
-      
+
       return (
         <Query
           query={userQuery}
@@ -112,6 +117,10 @@ class App extends React.Component<ApolloProps, State> {
                       </Menu.Item>
                       <Menu.Item key="billing">
                         <Link to="/billing"><Icon type="credit-card" /></Link>
+                        <span>Billing</span>
+                      </Menu.Item>
+                      <Menu.Item key="logout">
+                        <Link to="/logout"><Icon type="logout" /></Link>
                         <span>Billing</span>
                       </Menu.Item>
                     </Menu>
