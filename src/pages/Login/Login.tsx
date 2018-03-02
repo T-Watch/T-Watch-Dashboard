@@ -91,7 +91,7 @@ class Login extends React.Component<ApolloProps & Props, {}> {
 
       localStorage.setItem('token', data.token.token);
       localStorage.setItem('email', args.email);
-      localStorage.setItem('type', 'COACH');
+      localStorage.setItem('type', args.type);
 
       this.props.redirect();
     } catch (e) {
