@@ -1,14 +1,20 @@
 import * as React from 'react';
 import { Form, Icon, Input, Button, Checkbox, Layout } from 'antd';
+import { withApollo } from 'react-apollo';
+import { gql } from 'apollo-boost';
 import './Login.css';
 const FormItem = Form.Item;
 
 interface Props {
-  submit: Function;
   form: any;
+  redirect: Function;
 }
 
-class Login extends React.Component<Props, {}> {
+interface ApolloProps {
+  client: any;
+}
+
+class Login extends React.Component<ApolloProps & Props, {}> {
 
   public render() {
     const { getFieldDecorator } = this.props.form;
@@ -34,17 +40,11 @@ class Login extends React.Component<Props, {}> {
             )}
           </FormItem>
           <FormItem>
-            {getFieldDecorator('remember', {
-              valuePropName: 'checked',
-              initialValue: true,
-            })(
-              <Checkbox>Remember me</Checkbox>
-            )}
-            <a className="login-form-forgot" href="">Forgot password</a>
             <Button type="primary" htmlType="submit" className="login-form-button">
               Log in
           </Button>
             Or <a href="">register now!</a>
+            <a className="login-form-forgot" href="">Forgot password</a>
           </FormItem>
         </Form>
       </Layout>
@@ -55,8 +55,7 @@ class Login extends React.Component<Props, {}> {
     e.preventDefault();
     this.props.form.validateFields((err: any, values: any) => {
       if (!err) {
-        delete values.remember;
-        this.props.submit(
+        this.submit(
           values,
           (s: string) => {
             this.props.form.setFields({
@@ -73,6 +72,32 @@ class Login extends React.Component<Props, {}> {
       }
     });
   }
+
+  private submit = async (args: any, onError: Function) => {
+    try {
+      const { data } = await this.props.client.query({
+        query: gql`query Query($email: String!, $password: String!) {
+              token(email: $email, password: $password){
+                error
+                token
+              }
+            }`,
+        variables: args
+      });
+
+      if (data.token.error) {
+        throw new Error(data.token.error);
+      }
+
+      localStorage.setItem('token', data.token.token);
+      localStorage.setItem('email', args.email);
+      localStorage.setItem('type', 'COACH');
+
+      this.props.redirect();
+    } catch (e) {
+      onError(e.message);
+    }
+  }
 }
 
-export default Form.create()(Login);
+export default Form.create()(withApollo<Props, {}>(Login as any));

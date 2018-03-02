@@ -3,7 +3,7 @@
     background: transparent;
 }
 
-.ant-menu.ant-menu-dark .ant-menu-item-selected>.anticon {
+.ant-menu.ant-menu-dark .ant-menu-item-selected>a>.anticon {
     font-size: 28px;
 }
 

@@ -1,14 +1,14 @@
 import * as React from 'react';
-import { withApollo, Query } from 'react-apollo';
+import { Query } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { Layout, Menu, Icon, Avatar } from 'antd';
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Trainings from './Trainings';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
 import './App.css';
 
 interface ApolloProps {
-  client: any;
 }
 
 interface State {
@@ -38,108 +38,105 @@ class App extends React.Component<ApolloProps, State> {
 
   public render() {
     console.log('App rendered');
-    const login = (
-      <Login
-        submit={async (args: any, onError: Function) => {
-          try {
-            const { data } = await this.props.client.query({
-              query: gql`query Query($email: String!, $password: String!) {
-                    token(email: $email, password: $password){
-                      error
-                      token
-                    }
-                  }`,
-              variables: args
-            });
-            if (data.token.error) {
-              throw new Error(data.token.error);
-            }
-            localStorage.setItem('token', data.token.token);
-            localStorage.setItem('email', args.email);
-            localStorage.setItem('type', 'COACH');
-            this.forceUpdate();
-          } catch (e) {
-            onError(e.message);
-          }
-        }}
-      />
-    );
     if (!localStorage.getItem('token')) {
-      return login;
+      return <Login redirect={() => this.forceUpdate()} />;
     }
-    let page = <Dashboard />;
-    switch (this.state.page) {
-      case 'trainings':
-        page = <Trainings />;
-        break;
-      default:
-        break;
-    }
-    return (
-      <Query
-        query={userQuery}
-        variables={{
-          email: localStorage.getItem('email'),
-          coach: localStorage.getItem('type') === 'COACH'
-        } as any}
-      >
-        {({ loading, error, data, _ }) => {
-          if (loading) {
-            return (<span>Loading...</span>);
-          }
-          if (!error && data) {
-            console.log(data);
-            const user = (data as any).user;
-            const avatarProps = {
-              icon: 'user',
-              src: user.photo
-            };
+    const queryComponent = (router: any) => {
+      const q = new URLSearchParams(router.location.search);
+      if (q.get('token')) {
+        localStorage.setItem('token', q.get('token') as string);
+        localStorage.setItem('type', q.get('type') as string);
+        localStorage.setItem('email', q.get('email') as string);
+      }
 
-            return (
-              <Layout style={{ height: '100vh' }}>
-                <Layout.Sider collapsed={true} style={{ boxShadow: '3px 0 5px -2px #888' }}>
-                  <Menu
-                    theme="dark"
-                    mode="inline"
-                    selectedKeys={[this.state.page]}
-                    className="sider-menu"
-                  >
-                    <Menu.Item key="user">
-                      <Avatar {...avatarProps} />
-                    </Menu.Item>
-                    <Menu.Item key="dashboard">
-                      <Icon type="dashboard" onClick={() => this.setState({ page: 'dashboard' })} />
-                      <span>Dashboard</span>
-                    </Menu.Item>
-                    <Menu.Item key="trainings">
-                      <Icon type="solution" onClick={() => this.setState({ page: 'trainings' })} />
-                      <span>Trainings</span>
-                    </Menu.Item>
-                    <Menu.Item key="customers">
-                      <Icon type="team" onClick={() => this.setState({ page: 'customers' })} />
-                      <span>Customers</span>
-                    </Menu.Item>
-                    <Menu.Item key="calendar">
-                      <Icon type="calendar" onClick={() => this.setState({ page: 'calendar' })} />
-                      <span>Calendar</span>
-                    </Menu.Item>
-                    <Menu.Item key="billing">
-                      <Icon type="credit-card" onClick={() => this.setState({ page: 'billing' })} />
-                      <span>Billing</span>
-                    </Menu.Item>
-                  </Menu>
-                </Layout.Sider>
-                <Layout.Content style={{ margin: '16px' }}>
-                  {page}
-                </Layout.Content>
-              </Layout>
-            );
-          }
-          return login;
-        }}
-      </Query>
+      let page = <Dashboard />;
+      const route = router.match.params.page;
+      switch (router.match.params.page) {
+        case 'dashboard':
+          page = <Dashboard />;
+          break;
+        case 'trainings':
+          page = <Trainings />;
+          break;
+        default:
+          break;
+      }
+      
+      return (
+        <Query
+          query={userQuery}
+          variables={{
+            email: localStorage.getItem('email'),
+            coach: localStorage.getItem('type') === 'COACH'
+          } as any}
+        >
+          {({ loading, error, data, _ }) => {
+            if (loading) {
+              return (<span>Loading...</span>);
+            }
+            if (!error && data) {
+              console.log(data);
+              const user = (data as any).user;
+              const avatarProps = {
+                icon: 'user',
+                src: user.photo
+              };
+
+              return (
+                <Layout style={{ height: '100vh' }}>
+                  <Layout.Sider collapsed={true} style={{ boxShadow: '3px 0 5px -2px #888' }}>
+                    <Menu
+                      theme="dark"
+                      mode="inline"
+                      selectedKeys={[route || 'dashboard']}
+                      className="sider-menu"
+                    >
+                      <Menu.Item key="user">
+                        <Avatar {...avatarProps} />
+                      </Menu.Item>
+                      <Menu.Item key="dashboard">
+                        <Link to="/dashboard"><Icon type="dashboard" /></Link>
+                        <span>Dashboard</span>
+                      </Menu.Item>
+                      <Menu.Item key="trainings">
+                        <Link to="/trainings"><Icon type="solution" /></Link>
+                        <span>Trainings</span>
+                      </Menu.Item>
+                      <Menu.Item key="customers">
+                        <Link to="/customers"><Icon type="team" /></Link>
+                        <span>Customers</span>
+                      </Menu.Item>
+                      <Menu.Item key="calendar">
+                        <Link to="/calendar"><Icon type="calendar" /></Link>
+                        <span>Calendar</span>
+                      </Menu.Item>
+                      <Menu.Item key="billing">
+                        <Link to="/billing"><Icon type="credit-card" /></Link>
+                        <span>Billing</span>
+                      </Menu.Item>
+                    </Menu>
+                  </Layout.Sider>
+                  <Layout.Content style={{ margin: '16px' }}>
+                    {page}
+                  </Layout.Content>
+                </Layout>
+              );
+            }
+            return <Login redirect={() => this.forceUpdate()} />;
+          }}
+        </Query>
+      );
+    };
+
+    return (
+      <Router>
+        <div>
+          <Route exact={true} path="/" component={queryComponent} />
+          <Route path="/:page" component={queryComponent} />
+        </div>
+      </Router >
     );
   }
 }
 
-export default withApollo<{}, State>(App);
+export default App;
