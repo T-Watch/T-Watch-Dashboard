@@ -16,14 +16,11 @@ interface State {
 }
 
 const userQuery = gql`
-  query Query ($email: String!, $coach: Boolean!) {
+  query Query ($email: String!) {
     user (email: $email) {
       type
       name
       photo
-    }
-    trainings (coach: $email) @include(if: $coach) {
-      registryDate
     }
     users (coach: $email) {
       name
@@ -72,8 +69,7 @@ class App extends React.Component<ApolloProps, State> {
         <Query
           query={userQuery}
           variables={{
-            email: localStorage.getItem('email'),
-            coach: localStorage.getItem('type') === 'COACH'
+            email: localStorage.getItem('email')
           } as any}
         >
           {({ loading, error, data, _ }) => {
