@@ -51,7 +51,7 @@ class Trainings extends React.Component {
                               return null;
                             }
                             const maxDate = new Date(t.maxDate);
-                            if (maxDate.getTime() > new Date().getTime()) {
+                            if (maxDate.getTime() < new Date().getTime()) {
                               return <Icon type="warning" style={{ color: '#001529', fontWeight: 'bold' }} />;
                             }
                             return null;
