@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Query } from 'react-apollo';
+import { Query, graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { Table, Row, Col, Icon } from 'antd';
 import { Card, TrainingForm } from '../../components';
@@ -19,7 +19,17 @@ const query = gql`
   }
 `;
 
-class Trainings extends React.Component {
+const mutation = gql`
+  mutation Mutation ($_id: String!) {
+    deleteTraining(_id: $_id)
+  }
+`;
+
+interface Props {
+  mutate: Function;
+}
+
+class Trainings extends React.Component<Props, {}> {
   render() {
     return (
       <Query
@@ -96,7 +106,16 @@ class Trainings extends React.Component {
                               />
                               <Icon
                                 type="delete"
-                                onClick={(e: any) => { console.log(`Eliminar ${t._id}`); }}
+                                onClick={async (e: any) => {
+                                  try {
+                                    const res = await this.props.mutate({
+                                      variables: { _id: t._id }
+                                    });
+                                    console.log(res.data.deleteTraining);
+                                  } catch (e) {
+                                    console.error(e);
+                                  }
+                                }}
                                 style={{ cursor: 'pointer' }}
                               />
                             </span>
@@ -157,4 +176,4 @@ class Trainings extends React.Component {
   }
 }
 
-export default Trainings;
+export default graphql<any, Props>(mutation)(Trainings);
