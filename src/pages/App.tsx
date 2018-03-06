@@ -18,6 +18,7 @@ interface State {
 const userQuery = gql`
   query Query ($email: String!, $coach: Boolean!) {
     user (email: $email) {
+      type
       name
       photo
     }
@@ -82,11 +83,12 @@ class App extends React.Component<ApolloProps, State> {
             if (!error && data) {
               console.log(data);
               const user = (data as any).user;
+              localStorage.setItem('type', user.type);
               const avatarProps = {
                 icon: 'user',
                 src: user.photo
               };
-              
+
               return (
                 <Layout style={{ height: '100vh' }}>
                   <Layout.Sider collapsed={true} style={{ boxShadow: '3px 0 5px -2px #888' }}>
