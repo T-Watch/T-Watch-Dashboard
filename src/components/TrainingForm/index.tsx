@@ -15,23 +15,42 @@ const mutation = gql`
   }
 `;
 
-interface Props {
+interface InnerProps {
   form: any;
   mutate: Function;
 }
 
-class TrainingForm extends React.Component<Props, {}> {
+interface Props {
+  training?: any;
+}
+
+interface State {
+  tCopy: any;
+}
+
+class TrainingForm extends React.Component<Props & InnerProps, State> {
+  state: State = {
+    tCopy: {}
+  };
+
+  componentWillReceiveProps(nextProps: Props) {
+    this.setState({ tCopy: nextProps.training || {} });
+  }
+
   render() {
+    console.log('TrainingForm rendered');
     const { getFieldDecorator } = this.props.form;
+    const tCopy = this.state.tCopy;
+
     return (
       <Form onSubmit={this.handleSubmit}>
         <FormItem label="Type">
-          {getFieldDecorator('type', { rules: [{ required: true }] })(
+          {getFieldDecorator('type', { rules: [{ required: true }], initialValue: tCopy.type })(
             <Input prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />} placeholder="Training type" />
           )}
         </FormItem>
         <FormItem label="User">
-          {getFieldDecorator('user', { rules: [{ required: true }] })(
+          {getFieldDecorator('user', { rules: [{ required: true }], initialValue: tCopy.user })(
             <Input
               prefix={<Icon type="user" style={{ color: 'rgba(0,0,0,.25)' }} />}
               placeholder="Trained user"
@@ -39,7 +58,10 @@ class TrainingForm extends React.Component<Props, {}> {
           )}
         </FormItem>
         <FormItem label="Recommended date">
-          {getFieldDecorator('date', { rules: [{ required: true }] })(
+          {getFieldDecorator('date', {
+            rules: [{ required: true }],
+            initialValue: tCopy.date ? moment(new Date(tCopy.date)) : null
+          })(
             <DatePicker
               placeholder="Select date"
               showTime={true}
@@ -50,7 +72,9 @@ class TrainingForm extends React.Component<Props, {}> {
           )}
         </FormItem>
         <FormItem label="Date limit">
-          {getFieldDecorator('maxDate')(
+          {getFieldDecorator('maxDate', {
+            initialValue: tCopy.maxDate ? moment(new Date(tCopy.maxDate)) : null
+          })(
             <DatePicker
               placeholder="Select date"
               showTime={true}
@@ -61,13 +85,21 @@ class TrainingForm extends React.Component<Props, {}> {
           )}
         </FormItem>
         <FormItem label="Description">
-          {getFieldDecorator('description')(
+          {getFieldDecorator('description', { initialValue: tCopy.description })(
             <Input.TextArea placeholder="Give a little description about the training" />
           )}
         </FormItem>
-        <Button type="primary" htmlType="submit" className="login-form-button">
-          <Icon type="plus" style={{ fontWeight: 'bold' }} />
-        </Button>
+        <div className="login-form-button-group">
+          <Button type="primary" htmlType="submit" className="login-form-button">
+            <span style={{ letterSpacing: 1.5, fontWeight: 'bold' }} >{this.state.tCopy.type ? 'SAVE' : 'ADD'}</span>
+          </Button>
+          {this.state.tCopy.type ?
+            <Button type="danger" onClick={() => this.setState({ tCopy: {} })} className="login-form-button">
+              <span style={{ letterSpacing: 1.5, fontWeight: 'bold' }} >CANCEL</span>
+            </Button>
+            : null
+          }
+        </div>
       </Form>
     );
   }
@@ -92,4 +124,4 @@ class TrainingForm extends React.Component<Props, {}> {
   }
 }
 
-export default Form.create()(graphql<any, Props>(mutation)(TrainingForm));
+export default Form.create<Props>()(graphql<any, InnerProps>(mutation)(TrainingForm));

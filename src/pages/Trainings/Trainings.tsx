@@ -25,11 +25,19 @@ const mutation = gql`
   }
 `;
 
+interface State {
+  trainingToEdit: any;
+}
+
 interface Props {
   mutate: Function;
 }
 
-class Trainings extends React.Component<Props, {}> {
+class Trainings extends React.Component<Props, State> {
+  state: State = {
+    trainingToEdit: undefined
+  };
+
   render() {
     return (
       <Query
@@ -101,7 +109,9 @@ class Trainings extends React.Component<Props, {}> {
                             <span style={{ display: 'flex', justifyContent: 'space-evenly' }}>
                               <Icon
                                 type="edit"
-                                onClick={(e: any) => { console.log(`Editar ${t._id}`); }}
+                                onClick={(e: any) => {
+                                  this.setState({ trainingToEdit: t });
+                                }}
                                 style={{ cursor: 'pointer' }}
                               />
                               <Icon
@@ -162,7 +172,7 @@ class Trainings extends React.Component<Props, {}> {
                   </Col>
                   <Col span={6}>
                     <Card title="Add new training">
-                      <TrainingForm />
+                      <TrainingForm training={this.state.trainingToEdit} />
                     </Card>
                   </Col>
                 </Row>

@@ -1,3 +1,7 @@
 .date-form-input {
     width: 100%;
 }
+
+.login-form-button-group>* {
+    margin: 8px 0;
+}
