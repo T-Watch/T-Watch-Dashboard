@@ -1,8 +1,8 @@
 import * as React from 'react';
 import moment from 'moment';
-import { graphql } from 'react-apollo';
+import { withApollo } from 'react-apollo';
 import { gql } from 'apollo-boost';
-import { Form, Button, Input, DatePicker, Icon } from 'antd';
+import { Form, Button, Input, DatePicker, Icon, Select, Timeline } from 'antd';
 import './TrainingForm.css';
 
 const FormItem = Form.Item;
@@ -15,9 +15,17 @@ const mutation = gql`
   }
 `;
 
+const query = gql`
+  query Query ($coach: String!) {
+    trainingBlocks (coach: $coach) {
+      _id
+    }
+  }
+`;
+
 interface InnerProps {
   form: any;
-  mutate: Function;
+  client: any;
 }
 
 interface Props {
@@ -26,12 +34,23 @@ interface Props {
 
 interface State {
   tCopy: any;
+  trainingBlocks: any[];
 }
 
 class TrainingForm extends React.Component<Props & InnerProps, State> {
   state: State = {
-    tCopy: {}
+    tCopy: {},
+    trainingBlocks: []
   };
+
+  async componentDidMount() {
+    try {
+      const { data } = await this.props.client.query({ query, variables: { coach: localStorage.getItem('email') } });
+      this.setState({ trainingBlocks: data });
+    } catch (e) {
+      console.error(e);
+    }
+  }
 
   componentWillReceiveProps(nextProps: Props) {
     this.setState({ tCopy: nextProps.training || {} });
@@ -41,6 +60,9 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
     console.log('TrainingForm rendered');
     const { getFieldDecorator } = this.props.form;
     const tCopy = this.state.tCopy;
+    tCopy.trainingBlocks = [{ _id: 'jiji' }];
+
+    const tBlocks = [<Select.Option key={'Create new Training Block'} >Create new Training Block</Select.Option>];
 
     return (
       <Form onSubmit={this.handleSubmit}>
@@ -89,6 +111,41 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
             <Input.TextArea placeholder="Give a little description about the training" />
           )}
         </FormItem>
+        <FormItem label="Training Blocks">
+          {getFieldDecorator('trainingBlocks', {
+            rules: [{ required: true }],
+            initialValue: tCopy.trainingBlocks ? tCopy.trainingBlocks.map((e: any) => e._id) : undefined,
+            normalize: (v: any, pv: any, allvalues: any) => {
+              console.log(v);
+              if (v && v[v.length - 1] === 'Create new Training Block') {
+                // Call new training Block method
+                return v.filter((e: any) => e !== 'Create new Training Block');
+              }
+              return v;
+            }
+          })(
+            <Select
+              mode="tags"
+              placeholder="Choose the blocks of this training"
+              allowClear={true}
+            >
+              {
+                tCopy.trainingBlocks ?
+                  tBlocks.concat(tCopy.trainingBlocks.map((e: any) => (
+                    <Select.Option key={e._id} >{e._id}</Select.Option>
+                  )))
+                  : tBlocks
+              }
+            </Select>
+          )}
+        </FormItem>
+        <Timeline>
+          {this.props.form.getFieldValue('trainingBlocks') ?
+            this.props.form.getFieldValue('trainingBlocks').map((e: any) => (
+              <Timeline.Item key={e}>{e}</Timeline.Item>
+            )) : null
+          }
+        </Timeline>
         <div className="login-form-button-group">
           <Button type="primary" htmlType="submit" className="login-form-button">
             <span style={{ letterSpacing: 1.5, fontWeight: 'bold' }} >{this.state.tCopy.type ? 'SAVE' : 'ADD'}</span>
@@ -111,7 +168,8 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
         values.date = values.date.toString();
         values.maxDate = values.maxDate ? values.maxDate.toString() : undefined;
         try {
-          const res = await this.props.mutate({
+          const res = await this.props.client.mutate({
+            mutation,
             variables: { training: values }
           });
           this.props.form.resetFields();
@@ -124,4 +182,4 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
   }
 }
 
-export default Form.create<Props>()(graphql<any, InnerProps>(mutation)(TrainingForm));
+export default Form.create()(withApollo<InnerProps, {}>(TrainingForm as any)) as any;

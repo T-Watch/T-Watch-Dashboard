@@ -13,7 +13,9 @@ const query = gql`
       date
       maxDate
       description
-      trainingBlocks
+      trainingBlocks{
+        _id
+      }
       completed
     }
   }
