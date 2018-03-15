@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Trainings from './Trainings';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
+import Coaches from './Coaches/Coaches';
 import './App.css';
 
 interface ApolloProps {
@@ -56,11 +57,15 @@ class App extends React.Component<ApolloProps, State> {
         case 'trainings':
           page = <Trainings />;
           break;
+        case 'coaches':
+          page = <Coaches email='mariaentrenadora@gmail.com' />;
+          break;
         case 'logout':
           localStorage.removeItem('token');
           localStorage.removeItem('email');
           localStorage.removeItem('type');
           return <Login redirect={() => this.forceUpdate()} />;
+      
         default:
           break;
       }
@@ -123,6 +128,12 @@ class App extends React.Component<ApolloProps, State> {
                           <span>Billing</span>
                         </Menu.Item> : null
                       }
+                      {localStorage.getItem('type') === 'USER' ?
+                        <Menu.Item key="coaches">
+                          <Link to="/coaches"><Icon type="team" /></Link>
+                          <span>Coaches</span>
+                        </Menu.Item> : null
+                      }                     
                       <Menu.Item key="logout">
                         <Link to="/logout"><Icon type="logout" /></Link>
                         <span>Log out</span>
