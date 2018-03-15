@@ -109,6 +109,17 @@ class TrainingBlockModal extends React.Component<Props & InnerProps, State> {
     e.preventDefault();
     this.props.form.validateFields(async (err: any, values: any) => {
       if (!err) {
+        if (!values.duration && !values.distance) {
+          this.props.form.setFields({
+            duration: {
+              errors: [new Error('Distance or duration required')],
+            },
+            distance: {
+              errors: [new Error('Distance or duration required')],
+            },
+          });
+          return;
+        }
         try {
           const res = await this.props.client.mutate({
             mutation,

@@ -41,6 +41,7 @@ class Trainings extends React.Component<Props, State> {
   };
 
   render() {
+    console.log('Trainings rendered');
     return (
       <Query
         query={query}
