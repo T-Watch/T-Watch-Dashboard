@@ -3,6 +3,7 @@ import moment from 'moment';
 import { withApollo } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { Form, Button, Input, DatePicker, Icon, Select, Timeline } from 'antd';
+import TrainingBlockModal from '../TrainingBlockModal';
 import './TrainingForm.css';
 
 const FormItem = Form.Item;
@@ -19,6 +20,7 @@ const query = gql`
   query Query ($coach: String!) {
     trainingBlocks (coach: $coach) {
       _id
+      title
     }
   }
 `;
@@ -35,24 +37,33 @@ interface Props {
 interface State {
   tCopy: any;
   trainingBlocks: any[];
+  modal: boolean;
 }
 
 class TrainingForm extends React.Component<Props & InnerProps, State> {
   state: State = {
     tCopy: {},
-    trainingBlocks: []
+    trainingBlocks: [],
+    modal: false
   };
 
   async componentDidMount() {
     try {
       const { data } = await this.props.client.query({ query, variables: { coach: localStorage.getItem('email') } });
-      this.setState({ trainingBlocks: data });
+      this.setState({ trainingBlocks: data.trainingBlocks });
     } catch (e) {
       console.error(e);
     }
   }
 
   componentWillReceiveProps(nextProps: Props) {
+    const props = this.props;
+    if (nextProps.training && props.training && nextProps.training._id === props.training._id) {
+      return;
+    }
+    if (!nextProps.training && !props.training) {
+      return;
+    }
     this.setState({ tCopy: nextProps.training || {} });
   }
 
@@ -60,7 +71,6 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
     console.log('TrainingForm rendered');
     const { getFieldDecorator } = this.props.form;
     const tCopy = this.state.tCopy;
-    tCopy.trainingBlocks = [{ _id: 'jiji' }];
 
     const tBlocks = [<Select.Option key={'Create new Training Block'} >Create new Training Block</Select.Option>];
 
@@ -116,9 +126,8 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
             rules: [{ required: true }],
             initialValue: tCopy.trainingBlocks ? tCopy.trainingBlocks.map((e: any) => e._id) : undefined,
             normalize: (v: any, pv: any, allvalues: any) => {
-              console.log(v);
               if (v && v[v.length - 1] === 'Create new Training Block') {
-                // Call new training Block method
+                this.setState({ modal: true });
                 return v.filter((e: any) => e !== 'Create new Training Block');
               }
               return v;
@@ -130,20 +139,24 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
               allowClear={true}
             >
               {
-                tCopy.trainingBlocks ?
-                  tBlocks.concat(tCopy.trainingBlocks.map((e: any) => (
-                    <Select.Option key={e._id} >{e._id}</Select.Option>
-                  )))
-                  : tBlocks
+                tBlocks.concat(this.state.trainingBlocks.map((e: any) => (
+                  <Select.Option key={e._id}>{e.title}</Select.Option>
+                )))
               }
             </Select>
           )}
         </FormItem>
         <Timeline>
           {this.props.form.getFieldValue('trainingBlocks') ?
-            this.props.form.getFieldValue('trainingBlocks').map((e: any) => (
-              <Timeline.Item key={e}>{e}</Timeline.Item>
-            )) : null
+            this.props.form.getFieldValue('trainingBlocks').map((e: string) => {
+              for (let i = 0; i < this.state.trainingBlocks.length; i++) {
+                const tblock = this.state.trainingBlocks[i];
+                if (tblock._id === e) {
+                  return <Timeline.Item key={tblock._id}>{tblock.title}</Timeline.Item>;
+                }
+              }
+              return null;
+            }) : null
           }
         </Timeline>
         <div className="login-form-button-group">
@@ -157,6 +170,15 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
             : null
           }
         </div>
+        <TrainingBlockModal
+          visible={this.state.modal}
+          onCreated={(newTrainingBlock: any) => {
+            const trainingBlocks = this.props.form.getFieldValue('trainingBlocks') || [];
+            this.props.form.setFieldsValue({ trainingBlocks: [...trainingBlocks, newTrainingBlock._id] });
+            this.setState({ modal: false, trainingBlocks: [...this.state.trainingBlocks, newTrainingBlock] });
+          }}
+          onCancel={() => this.setState({ modal: false })}
+        />
       </Form>
     );
   }
