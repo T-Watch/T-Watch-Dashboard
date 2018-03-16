@@ -61,7 +61,7 @@ CoachState> {
 }
 
 setCoach = async() => {
-    const email = this.props.email;
+    const email = this.props.email + '.com';
     console.log(email);
     
     try {
@@ -86,8 +86,29 @@ setCoach = async() => {
       });
       console.log('datos');
       console.log(data.user);
-
-      let coach = Object.assign({}, this.state.coach);    
+      if (data.user !== null) {
+        this.setState({
+          name: data.user.name
+          });   
+          
+        this.setState(prevState => ({
+        coach: {
+          ...prevState.coach,
+          name : data.user.name,  
+          lastName : data.user.lastName, 
+          district : data.user.district,
+          province : data.user.province, 
+          phoneNumber : data.user.phoneNumber, 
+          email : data.user.email,
+          fields : data.user.fields,
+          age : this.getAge(data.user.birthday),
+          gender : data.user.gender
+      }
+    }));
+    
+    }
+      
+      /*let coach = Object.assign({}, this.state.coach);    
       coach.name = data.user.name;  
       coach.lastName = data.user.lastName; 
       coach.district = data.user.district; 
@@ -98,7 +119,7 @@ setCoach = async() => {
       coach.age = this.getAge(data.user.birthday);
       coach.gender = data.user.gender;
       this.setState({coach});
-      console.log(this.state.coach);   
+      console.log(this.state.coach);*/      
  
     } catch (e) {
       console.log(e.message);
@@ -116,13 +137,28 @@ handleHire = () => {
   //
 }
   render() {
+    console.log(this.state.email + '.com');
     return (
+      <Query
+        query={userQuery}
+        variables={{
+        email: this.state.email + '.com'
+      } as any}
+      >
+      {({ loading, error, data, _ }) => {
+        if (loading) {
+          return (<span>Loading...</span>);
+        }
+        if (!error && data) {
+          console.log(data);
+
+          return (
       <div>
       <Card 
         title={
           <div>
             <Avatar icon="user" />
-            &nbsp;  &nbsp; {this.state.coach.name}  &nbsp; 
+            &nbsp;  &nbsp; {this.state.name}  &nbsp; 
             {this.state.coach.lastName}
           </div>
         }
@@ -145,7 +181,13 @@ handleHire = () => {
           <Button style={{textAlign: 'center'}} onClick={this.handleHire}>Contratar</Button>
           </div>
       </Card>
-      </div>);  
+      </div>);
+        }
+        return null;
+        
+      }}  
+      </Query>
+    );
   }
 }
 

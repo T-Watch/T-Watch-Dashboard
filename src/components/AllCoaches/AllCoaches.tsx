@@ -42,7 +42,6 @@ initCoaches = async () => {
           fields
         }
       }`  });
-      console.log(data.coaches);
     this.setState({
       coaches: data.coaches
       });

@@ -14,6 +14,7 @@ interface ApolloProps {
 
 interface State {
   page: string;
+  email: string;
 }
 
 const userQuery = gql`
@@ -32,7 +33,8 @@ const userQuery = gql`
 
 class App extends React.Component<ApolloProps, State> {
   state: State = {
-    page: 'dashboard'
+    page: 'dashboard',
+    email: 'mariamolgas@gmail.com'
   };
 
   public render() {
@@ -40,16 +42,16 @@ class App extends React.Component<ApolloProps, State> {
     if (!localStorage.getItem('token')) {
       return <Login redirect={() => this.forceUpdate()} />;
     }
-    const queryComponent = (router: any) => {
+    const queryComponent = (router: any) => {      
       const q = new URLSearchParams(router.location.search);
       if (q.get('token')) {
         localStorage.setItem('token', q.get('token') as string);
         localStorage.setItem('type', q.get('type') as string);
         localStorage.setItem('email', q.get('email') as string);
       }
-
-      let page = <Dashboard />;
       const route = router.match.params.page;
+      let page = <Dashboard />;
+
       switch (router.match.params.page) {
         case 'dashboard':
           page = <Dashboard />;
@@ -58,15 +60,16 @@ class App extends React.Component<ApolloProps, State> {
           page = <Trainings />;
           break;
         case 'coaches':
-          page = <Coaches email='mariaentrenadora@gmail.com' />;
+          page = <Coaches email={router.match.params.email} />;
           break;
+
         case 'logout':
           localStorage.removeItem('token');
           localStorage.removeItem('email');
           localStorage.removeItem('type');
           return <Login redirect={() => this.forceUpdate()} />;
       
-        default:
+        default:        
           break;
       }
 
@@ -157,6 +160,8 @@ class App extends React.Component<ApolloProps, State> {
         <div>
           <Route exact={true} path="/" component={queryComponent} />
           <Route path="/:page" component={queryComponent} />
+          <Route exact={true} path="/:page/:email?" component={queryComponent} />
+          
         </div>
       </Router >
     );

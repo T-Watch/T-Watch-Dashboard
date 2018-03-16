@@ -40,9 +40,9 @@ export default class TrainerCard extends React.Component <CoachCardProps, CoachC
         };
     }
     toggleModal = () => {
-        this.setState({
-            isActive: !this.state.isActive
-        });
+        window.location.href =
+                'http://localhost:3000/coaches/' + this.props.email;
+                
     }
     render() {
         return (
