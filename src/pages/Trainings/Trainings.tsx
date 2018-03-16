@@ -49,7 +49,7 @@ class Trainings extends React.Component<Props, State> {
           email: localStorage.getItem('email')
         } as any}
       >
-        {({ loading, error, data }) => {
+        {({ loading, error, data, refetch }) => {
           if (loading) {
             return (<span>Loading...</span>);
           }
@@ -121,10 +121,10 @@ class Trainings extends React.Component<Props, State> {
                                 type="delete"
                                 onClick={async (e: any) => {
                                   try {
-                                    const res = await this.props.mutate({
+                                    await this.props.mutate({
                                       variables: { _id: t._id }
                                     });
-                                    console.log(res.data.deleteTraining);
+                                    refetch();
                                   } catch (e) {
                                     console.error(e);
                                   }
@@ -175,7 +175,7 @@ class Trainings extends React.Component<Props, State> {
                   </Col>
                   <Col span={6}>
                     <Card title="Add new training">
-                      <TrainingForm training={this.state.trainingToEdit} />
+                      <TrainingForm training={this.state.trainingToEdit} onAdded={() => refetch()} />
                     </Card>
                   </Col>
                 </Row>

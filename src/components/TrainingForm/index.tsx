@@ -11,7 +11,16 @@ const FormItem = Form.Item;
 const mutation = gql`
   mutation Mutation ($training: TrainingInput!) {
     training (input: $training){
-      coach
+      _id
+      type
+      user
+      date
+      maxDate
+      description
+      trainingBlocks{
+        _id
+      }
+      completed
     }
   }
 `;
@@ -32,6 +41,7 @@ interface InnerProps {
 
 interface Props {
   training?: any;
+  onAdded: Function;
 }
 
 interface State {
@@ -189,12 +199,16 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
         values.coach = localStorage.getItem('email');
         values.date = values.date.toString();
         values.maxDate = values.maxDate ? values.maxDate.toString() : undefined;
+        if (this.props.training && this.props.training._id) {
+          values._id = this.props.training._id;
+        }
         try {
           const res = await this.props.client.mutate({
             mutation,
             variables: { training: values }
           });
           this.props.form.resetFields();
+          this.props.onAdded();
           console.log(res);
         } catch (e) {
           console.error(e);
