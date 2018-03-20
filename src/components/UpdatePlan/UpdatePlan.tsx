@@ -53,10 +53,10 @@ handleSubmit = (e: any) => {
             })
             .then(({ data }: any) => {
                 console.log(data);
+                this.state.close();
               }).catch((error: any) => {
                 console.log('there was an error sending the query', error);
               });
-            this.state.close();
            // console.log('Usuario: \n', values);
             /*this.props.mutate({
                 variables: { user: values }

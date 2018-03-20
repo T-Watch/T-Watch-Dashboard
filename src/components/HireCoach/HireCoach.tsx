@@ -28,6 +28,7 @@ query Query($email: String!) {
 
 interface HireCoachProps {
      email: string;
+     close: Function;
 }
 interface ApolloProps {
     client: any;
@@ -41,6 +42,7 @@ interface CoachState {
      email: string;
      district: string;
      province: string;
+     close: Function;
   }
 
 class HireCoach extends React.Component<HireCoachPropsFull & ApolloProps,
@@ -52,7 +54,8 @@ constructor(props: HireCoachPropsFull & ApolloProps) {
         isActiveModal: false,
         email: this.props.email,
         province: '',
-        district: ''
+        district: '',
+        close: this.props.close
       };
 }
 
@@ -108,6 +111,7 @@ handleSubmit = (e: any) => {
               });
            
         }
+        this.state.close();
     });
 }
 

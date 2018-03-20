@@ -31,6 +31,15 @@ export default class PlanCard extends React.Component <PlanCardProps, PlanCardSt
             'http://localhost:3000/billing';
         }*/
     }
+    endModal = () => {
+        this.setState({
+            isActive: !this.state.isActive
+        });
+       
+        window.location.href =
+            'http://localhost:3000/billing';
+
+    }
     render() {
         return (
             <div >
@@ -59,7 +68,7 @@ export default class PlanCard extends React.Component <PlanCardProps, PlanCardSt
                     />
 
                     <UpdatePlan 
-                        close={this.toggleModal}
+                        close={this.endModal}
                         coach={this.props.coach} 
                         type={this.props.type} 
                         monthlyPrince={this.props.monthlyPrice}

@@ -77,7 +77,7 @@ render() {
             }}
                 onClick={this.toggleModal}
             />
-                <HireCoach email={this.props.email}/>
+                <HireCoach email={this.props.email} close={this.toggleModal}/>
             </Modal>
         </Card>
         </div>
