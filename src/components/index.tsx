@@ -6,6 +6,7 @@ import Coach from './Coach/Coach';
 import AllCoaches from './AllCoaches/AllCoaches';
 import CoachCard from './CoachCard/CoachCard';
 import ShowTargets from './ShowTargets/ShowTargets';
+import HireCoach from './HireCoach/HireCoach';
 
 export {
   Card,
@@ -15,5 +16,6 @@ export {
   Coach,
   AllCoaches,
   CoachCard,
-  ShowTargets
+  ShowTargets,
+  HireCoach
 };

@@ -34,7 +34,6 @@ targets = () => {
      <div>
      {this.props.coaches.map(function(coach: any, i: any) {
        return   <ul key={coach.email}>
-       {console.log(coach.lastName)}
        <CoachCard 
        name={coach.name} 
        lastName={coach.lastName}

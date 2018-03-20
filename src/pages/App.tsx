@@ -60,9 +60,12 @@ class App extends React.Component<ApolloProps, State> {
           page = <Trainings />;
           break;
         case 'coaches':
-          page = <Coaches email={router.match.params.email} />;
-          break;
-
+        let idCoach = '';
+        if (q.get('id')) {
+          idCoach = q.get('id') as string;
+        }
+        page = <Coaches email={idCoach} />;
+        break;
         case 'logout':
           localStorage.removeItem('token');
           localStorage.removeItem('email');
@@ -159,9 +162,7 @@ class App extends React.Component<ApolloProps, State> {
       <Router>
         <div>
           <Route exact={true} path="/" component={queryComponent} />
-          <Route path="/:page" component={queryComponent} />
-          <Route exact={true} path="/:page/:email?" component={queryComponent} />
-          
+          <Route path="/:page" component={queryComponent} /> 
         </div>
       </Router >
     );
