@@ -7,6 +7,7 @@ import Trainings from './Trainings';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
 import Coaches from './Coaches/Coaches';
+import Billing from './Billing/Billing';
 import './App.css';
 
 interface ApolloProps {
@@ -65,6 +66,10 @@ class App extends React.Component<ApolloProps, State> {
           idCoach = q.get('id') as string;
         }
         page = <Coaches email={idCoach} />;
+        break;
+        case 'billing':
+        const coachEmail = localStorage.getItem('email');
+        page = <Billing coach={coachEmail}/>
         break;
         case 'logout':
           localStorage.removeItem('token');

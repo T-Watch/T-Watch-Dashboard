@@ -24,7 +24,7 @@ interface CoachCardState {
     email: string;
     fields: string[];
 }
-export default class TrainerCard extends React.Component <CoachCardProps, CoachCardState > {
+export default class CoachCard extends React.Component <CoachCardProps, CoachCardState > {
     constructor(props: CoachCardProps) {
         super(props);
         this.state = {
@@ -62,6 +62,7 @@ export default class TrainerCard extends React.Component <CoachCardProps, CoachC
                     <p><Icon type="mail" />   {this.state.description}</p>
                     <p><Icon type="pushpin-o" />   {this.state.fields.toString()}</p>
                 </Card>
+                
             </div>
         );
     }

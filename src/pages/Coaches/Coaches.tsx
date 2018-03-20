@@ -75,8 +75,6 @@ getAge = (birthdayDate: Date) => { // birthday is a date
 }
 
   render() {
-    console.log(this.props.email);
-    console.log(this.state.coach);
     if (!this.props.email || !this.state.coach) {
       return( 
       <div>

@@ -7,7 +7,8 @@ import AllCoaches from './AllCoaches/AllCoaches';
 import CoachCard from './CoachCard/CoachCard';
 import ShowTargets from './ShowTargets/ShowTargets';
 import HireCoach from './HireCoach/HireCoach';
-
+import PlanCard from './PlanCard/PlanCard';
+import UpdatePlan from './UpdatePlan/UpdatePlan';
 export {
   Card,
   InboxMessage,
@@ -17,5 +18,7 @@ export {
   AllCoaches,
   CoachCard,
   ShowTargets,
-  HireCoach
+  HireCoach,
+  PlanCard,
+  UpdatePlan
 };
