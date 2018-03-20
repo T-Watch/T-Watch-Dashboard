@@ -41,7 +41,7 @@ export default class CoachCard extends React.Component <CoachCardProps, CoachCar
     }
     toggleModal = () => {
         window.location.href =
-                'http://localhost:3000/coaches/' + this.props.email;
+                'http://localhost:3000/coaches?id=' + this.props.email;
                 
     }
     render() {

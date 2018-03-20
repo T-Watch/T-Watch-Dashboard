@@ -2,17 +2,27 @@ import * as React from 'react';
 import { Form, Radio, Icon, Tooltip, InputNumber, Button } from 'antd';
 import moment from 'moment';
 import { Query } from 'react-apollo';
-import { withApollo } from 'react-apollo';
-import { graphql } from 'react-apollo';
+import { withApollo, graphql, compose } from 'react-apollo';
 import { gql } from 'apollo-boost';
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
 
-const query = gql`
-query Query($coach: String!) {
+const queryuser = gql`
+query Query($coach: String) {
   plans(coach: $coach){
-   _id
+   _id,
+   type,
    monthlyPrice
+  }
+}`;
+const query = gql`
+query Query($email: String!) {
+  user(email: $email){
+    name
+    lastName
+    phoneNumber
+    district
+    province
   }
 }`;
 
@@ -29,6 +39,8 @@ interface HireCoachPropsFull extends HireCoachProps {
 interface CoachState {
      isActiveModal: boolean;
      email: string;
+     district: string;
+     province: string;
   }
 
 class HireCoach extends React.Component<HireCoachPropsFull & ApolloProps,
@@ -38,7 +50,9 @@ constructor(props: HireCoachPropsFull & ApolloProps) {
     super(props);
     this.state = {
         isActiveModal: false,
-        email: this.props.email
+        email: this.props.email,
+        province: '',
+        district: ''
       };
 }
 
@@ -52,34 +66,47 @@ toggleModal = () => {
     });
 }
 
+async componentDidMount() {
+    const email = localStorage.getItem('email');
+    try {
+    const {data} = await this.props.client.query({
+      query,
+      variables: {
+        email: email
+      }
+    });
+    this.setState({district: data.user.district});
+    this.setState({province: data.user.province});
+    
+}catch(e){
+    console.error(e);
+  }
+  }
+
 handleSubmit = (e: any) => {
     e.preventDefault();
 
     this.props.form.validateFields((err: any, values: any) => {
         const month = values.numberOfMonths;
         const diff = moment().add('months', month);
-        values.plan.dueDate = diff;
+        delete values.numberOfMonths;
+        values.plan.dueDate = diff.toDate();
+        values.district = this.state.district;
+        values.province = this.state.province;
+        values.email = localStorage.getItem('email');
       //  values.plan.plan = idPlan;
+      console.log(values);
         if (!err) {
             this.props.mutate({
-                variables: { updatePlan: values }
+               variables: { updatePlan: values }
             })
             .then(({ data }: any) => {
                 console.log('got data');
+                console.log(data);
               }).catch((error: any) => {
                 console.log('there was an error sending the query', error);
               });
-           // console.log('Usuario: \n', values);
-            /*this.props.mutate({
-                variables: { user: values }
-            })
-            .then(({ data }: any) => {
-              //  console.log('got data');
-              }).catch((error: any) => {
-             //   console.log('there was an error sending the query', error);
-              });
-          //  this.state.close();
-            // console.log('Received values of form: ', values);*/
+           
         }
     });
 }
@@ -116,81 +143,108 @@ render() {
             }
         }
     };
+ 
     return(
-    <Query
-        query={query}
-        variables={{
-        coach: 'mariaentrenadora@gmail.com' // this.props.email
-      } as any}
-    >
-    {({ loading, error, data }) => {
-      if (loading) {
-        return (<span>Loading...</span>);
-      }
-      if (!error && data) {
-       console.log(data);
-       return(
-        <div>
+        <Query
+          query={queryuser}
+          variables={{
+          coach: this.props.email
+        } as any}
+        >
+        {({ loading, error, data }) => {
+          
+          if (!error && data) {
+            let basic = { 
+                price: 0, idPlan: '' 
+            };
+            let standar = { 
+                price: 0, idPlan: '' 
+            };
+            let premium = { 
+                price: 0, idPlan: '' 
+            };
             
-      <Form onSubmit={this.handleSubmit}>
-      <FormItem {...formItemLayout} label="Elije de suscripción">
-                    {getFieldDecorator('plan.plan', {
-                        initialValue: 'BASIC',
-                        rules: [
-                            {
-                                required: true,
-                                message: 'Por favor, introduce el plan al que se va a suscribir'
-                            }
-                        ]
-                    })(
-                        <RadioGroup> 
-                            <Radio value="BASIC"> {/*el value sera el ID del plan que coja*/}
-                            <span> Basic&nbsp; - Precio &nbsp;</span>
-                            <Tooltip title="Entrenamiento online">
-                              <Icon type="question-circle-o" />
-                            </Tooltip>
-                          </Radio>
-                          <br/>
-                            <Radio value="STANDAR">Standar&nbsp;
-                            <Tooltip title="Basic + quedadas con tu entrenador">
-                              <Icon type="question-circle-o" />
-                            </Tooltip>
-                          </Radio>    
-                          <br/>                                                  
-                            <Radio value="PREMIUM">Premium&nbsp;
-                            <Tooltip title="Standard + test físico inicial en un centro cercano al usuario">
-                              <Icon type="question-circle-o" />
-                            </Tooltip>
-                          </Radio>  
-                        </RadioGroup>
-                    )}
-                </FormItem>
-                <FormItem {...formItemLayout} label="Numero de meses que desea contratar">
-            {getFieldDecorator('numberOfMonths', {
-                initialValue: 1,
-                rules: [
-                    {
-                        required: true,
-                    }
-                ]
+            if ((data as any).plans) {
+
+            const plans = (data as any).plans;        
+            for (var i = 0; i < plans.length; i++) {
+                if (plans[i].type === 'BASIC') {
+                    basic.price = plans[i].monthlyPrice;
+                    basic.idPlan = plans[i]._id;
+                } else if (plans[i].type === 'STANDAR') {
+                    standar.price = plans[i].monthlyPrice;
+                    standar.idPlan = plans[i]._id;   
+                } else if (plans[i].type === 'PREMIUM') {
+                    premium.price = plans[i].monthlyPrice;
+                    premium.idPlan = plans[i]._id;                    
+              }
             }
-            )(<InputNumber
-                min={1}
-                max={24}
-            />)}
-            <span className="ant-form-text"> meses</span>
-            </FormItem> 
-            <FormItem {...tailFormItemLayout}>
-                    <Button type="primary" htmlType="submit">Contratar</Button>
-            </FormItem>
-      </Form>
-    </div>  
-           );
         }
-      return <span>{error}</span>;
-      }}
-    </Query>
-    );   
+            return (
+
+              <div>       
+                <Form onSubmit={this.handleSubmit}>
+                <FormItem {...formItemLayout} label="Elije de suscripción">
+                                {getFieldDecorator('plan.plan', {
+                                    initialValue: 'BASIC',
+                                    rules: [
+                                        {
+                                            required: true,
+                                            message: 'Por favor, introduce el plan al que se va a suscribir'
+                                        }
+                                    ]
+                                })(
+                                    <RadioGroup> 
+                                        <Radio value={basic.idPlan}> {/*el value sera el ID del plan que coja*/}
+                                        <Tooltip title="Entrenamiento online">
+                                        <Icon type="question-circle-o" />
+                                        </Tooltip>
+                                        <span> Basic&nbsp; - {basic.price}€/mes &nbsp;</span>
+                                    </Radio>
+                                    <br/>
+                                        <Radio value={standar.idPlan}>
+                                        <Tooltip title="Basic + quedadas con tu entrenador">
+                                        <Icon type="question-circle-o" />
+                                        </Tooltip>
+                                        <span> Standar&nbsp; - {standar.price}€/mes &nbsp;</span> 
+                                    </Radio>    
+                                    <br/>                                                  
+                                        <Radio value={premium.idPlan}>
+                                        <Tooltip title="Standar + test físico inicial en un centro cercano al usuario">
+                                        <Icon type="question-circle-o" />
+                                        </Tooltip>
+                                        <span> Premium&nbsp; - {premium.price}€/mes &nbsp;</span>    
+                                    </Radio>  
+                                    </RadioGroup>
+                                )}
+                            </FormItem>
+                            <FormItem {...formItemLayout} label="Deseo contratar ">
+                        {getFieldDecorator('numberOfMonths', {
+                            initialValue: 1,
+                            rules: [
+                                {
+                                    required: true,
+                                }
+                            ]
+                        }
+                        )(<InputNumber
+                            min={1}
+                            max={24}
+                        />)}
+                        <span className="ant-form-text"> meses</span>
+                        </FormItem> 
+                        <FormItem {...tailFormItemLayout}>
+                                <Button type="primary" htmlType="submit">Contratar</Button>
+                        </FormItem>
+                </Form>
+            </div>  
+        );
+          }
+          return <span>{error}</span>;
+        }}
+        </Query>
+ );
+
 }
 }
 const hireCoachMutation = gql`
@@ -202,6 +256,11 @@ mutation Mutation($updatePlan: UpdateUserInput!){
 }
 `;
 
-// export default Form.create()(HireCoach);
-// export default Form.create()(withApollo<HireCoachPropsFull, {}>(HireCoach as any));
-export default Form.create()(graphql<{}, HireCoachPropsFull>(hireCoachMutation)(HireCoach as any));
+ //export default Form.create()(HireCoach);
+//export default Form.create()(withApollo<HireCoachProps, {}>(HireCoach as any));
+
+// export default Form.create()(graphql<{}, HireCoachPropsFull>(hireCoachMutation)(HireCoach as any));
+export default Form.create()(compose(
+    withApollo,
+    graphql<{}, HireCoachPropsFull>(hireCoachMutation),
+ )(HireCoach as any));

@@ -54,7 +54,7 @@ CoachesState> {
     if (!this.props.email) {
       return;
     }
-    try{
+    try {
     const res = await this.props.client.query({
       query,
       variables: {
@@ -96,7 +96,8 @@ getAge = (birthdayDate: Date) => { // birthday is a date
             </Card>
           </Col>
         </Row>
-    </div>);
+    </div>
+    );
     }
     const data = {user: this.state.coach};
     const names = (data as any).user.name;
