@@ -19,6 +19,15 @@ const mutation = gql`
       description
       trainingBlocks{
         _id
+        title
+        distance
+        duration
+        maxHR
+        minHR
+        maxSpeed
+        minSpeed
+        altitude
+        schema
       }
       completed
     }
@@ -30,6 +39,14 @@ const query = gql`
     trainingBlocks (coach: $coach) {
       _id
       title
+      distance
+      duration
+      maxHR
+      minHR
+      maxSpeed
+      minSpeed
+      altitude
+      schema
     }
   }
 `;
@@ -48,13 +65,15 @@ interface State {
   tCopy: any;
   trainingBlocks: any[];
   modal: boolean;
+  tBlockToEdit: any;
 }
 
 class TrainingForm extends React.Component<Props & InnerProps, State> {
   state: State = {
     tCopy: {},
     trainingBlocks: [],
-    modal: false
+    modal: false,
+    tBlockToEdit: {}
   };
 
   async componentDidMount() {
@@ -162,7 +181,14 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
               for (let i = 0; i < this.state.trainingBlocks.length; i++) {
                 const tblock = this.state.trainingBlocks[i];
                 if (tblock._id === e) {
-                  return <Timeline.Item key={tblock._id}>{tblock.title}</Timeline.Item>;
+                  return <Timeline.Item key={tblock._id}>
+                    <span
+                      onClick={() => this.editTBlock(tblock)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {tblock.title}
+                    </span>
+                  </Timeline.Item>;
                 }
               }
               return null;
@@ -187,13 +213,26 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
             this.props.form.setFieldsValue({ trainingBlocks: [...trainingBlocks, newTrainingBlock._id] });
             this.setState({ modal: false, trainingBlocks: [...this.state.trainingBlocks, newTrainingBlock] });
           }}
-          onCancel={() => this.setState({ modal: false })}
+          onUpdated={(newTrainingBlock: any) => {
+            const temp = [];
+            for (let i = 0; i < this.state.trainingBlocks.length; i++) {
+              if (this.state.trainingBlocks[i]._id === newTrainingBlock._id) {
+                temp[i] = newTrainingBlock;
+                continue;
+              }
+              temp[i] = this.state.trainingBlocks[i];
+            }
+            this.setState({ modal: false, trainingBlocks: temp });
+          }}
+          onCancel={() => this.setState({ modal: false, tBlockToEdit: {} })}
+          tBlock={this.state.tBlockToEdit}
         />
       </Form>
     );
   }
   private handleSubmit = async (e: any) => {
     e.preventDefault();
+    e.stopPropagation();
     this.props.form.validateFields(async (err: any, values: any) => {
       if (!err) {
         values.coach = localStorage.getItem('email');
@@ -216,6 +255,10 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
       }
     });
   }
+
+  private editTBlock = async (tBlock: any) => {
+    this.setState({ tBlockToEdit: tBlock, modal: true });
+  }
 }
 
-export default Form.create()(withApollo<InnerProps, {}>(TrainingForm as any)) as any;
+export default withApollo<Props, {}>(Form.create()(TrainingForm));

@@ -15,6 +15,7 @@ const query = gql`
       description
       trainingBlocks{
         _id
+        title
       }
       completed
     }
@@ -175,7 +176,10 @@ class Trainings extends React.Component<Props, State> {
                   </Col>
                   <Col span={6}>
                     <Card title="Add new training">
-                      <TrainingForm training={this.state.trainingToEdit} onAdded={() => refetch()} />
+                      <TrainingForm
+                        training={this.state.trainingToEdit}
+                        onAdded={() => { this.setState({ trainingToEdit: undefined }); refetch(); }}
+                      />
                     </Card>
                   </Col>
                 </Row>
