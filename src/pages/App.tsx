@@ -6,6 +6,7 @@ import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Trainings from './Trainings';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
+import Calendar from './Calendar';
 import './App.css';
 
 interface ApolloProps {
@@ -21,10 +22,6 @@ const userQuery = gql`
       type
       name
       photo
-    }
-    users (coach: $email) {
-      name
-      email
     }
   }
 `;
@@ -55,6 +52,9 @@ class App extends React.Component<ApolloProps, State> {
           break;
         case 'trainings':
           page = <Trainings />;
+          break;
+        case 'calendar':
+          page = <Calendar />;
           break;
         case 'logout':
           localStorage.removeItem('token');
