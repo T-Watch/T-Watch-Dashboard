@@ -29,17 +29,14 @@ const mutation = gql`
 `;
 
 interface State {
-  trainingToEdit: any;
 }
 
 interface Props {
   mutate: Function;
+  router: any;
 }
 
 class Trainings extends React.Component<Props, State> {
-  state: State = {
-    trainingToEdit: undefined
-  };
 
   render() {
     console.log('Trainings rendered');
@@ -55,7 +52,14 @@ class Trainings extends React.Component<Props, State> {
             return (<span>Loading...</span>);
           }
           if (!error && data) {
+            const q = new URLSearchParams(this.props.router.location.search);
             const trainings = (data as any).trainings;
+            let trainingToEdit;
+
+            if (q.get('edit')) {
+              trainingToEdit = trainings.filter((e: any) => e._id === q.get('edit'))[0];
+            }
+
             return (
               <div>
                 <Row gutter={8}>
@@ -114,7 +118,7 @@ class Trainings extends React.Component<Props, State> {
                               <Icon
                                 type="edit"
                                 onClick={(e: any) => {
-                                  this.setState({ trainingToEdit: t });
+                                  this.props.router.history.replace(`/trainings?edit=${t._id}`);
                                 }}
                                 style={{ cursor: 'pointer' }}
                               />
@@ -177,8 +181,9 @@ class Trainings extends React.Component<Props, State> {
                   <Col span={6}>
                     <Card title="Add new training">
                       <TrainingForm
-                        training={this.state.trainingToEdit}
-                        onAdded={() => { this.setState({ trainingToEdit: undefined }); refetch(); }}
+                        training={trainingToEdit}
+                        onAdded={() => { this.props.router.history.replace('/trainings'); refetch(); }}
+                        onCancel={() => { this.props.router.history.replace('/trainings'); }}
                       />
                     </Card>
                   </Col>

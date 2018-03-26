@@ -3,6 +3,7 @@ import moment from 'moment';
 import { Calendar, Badge, Col, Row, Timeline } from 'antd';
 import { Query } from 'react-apollo';
 import { gql } from 'apollo-boost';
+import { Link } from 'react-router-dom';
 import { Card } from '../../components';
 import './Calendar.css';
 
@@ -13,6 +14,9 @@ const query = gql`
       date
       completed
       _id
+      trainingBlocks {
+        _id
+      }
     }
   }
 `;
@@ -69,13 +73,16 @@ class CalendarPage extends React.Component<Props, State> {
                 }
                 return (
                   <Timeline.Item key={t._id} color={color}>
-                    <span
-                      onClick={() => console.log(t)}
-                      style={{ cursor: 'pointer', textDecoration: color === 'grey' ? 'line-through' : 'none' }}
-                    >
-                      <span>{t.user}</span>
-                      <span>{t.description}</span>
-                    </span>
+                    <Link to={`/trainings?edit=${t._id}`}>
+                      <span
+                        style={{ cursor: 'pointer', textDecoration: color === 'grey' ? 'line-through' : 'none' }}
+                      >
+                        {localStorage.getItem('type') === 'COACH' ?
+                          <span>{t.user}</span> : <span>{t.trainingBlocks.length} Training Blocks</span>}
+                        {t.description && localStorage.getItem('type') === 'COACH' ? <span> - </span> : null}
+                        <span>{t.description}</span>
+                      </span>
+                    </Link>
                   </Timeline.Item>
                 );
               });
@@ -128,7 +135,8 @@ class CalendarPage extends React.Component<Props, State> {
                 <Badge
                   style={item.completed ? { textDecoration: 'line-through' } : {}}
                   status={status}
-                  text={item.user}
+                  text={localStorage.getItem('type') === 'COACH' ?
+                  item.user : `${item.trainingBlocks.length} Training Blocks`}
                 />
               </li>
             );

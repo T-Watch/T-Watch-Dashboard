@@ -51,7 +51,7 @@ class App extends React.Component<ApolloProps, State> {
           page = <Dashboard />;
           break;
         case 'trainings':
-          page = <Trainings />;
+          page = <Trainings router={router} />;
           break;
         case 'calendar':
           page = <Calendar />;

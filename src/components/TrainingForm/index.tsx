@@ -59,10 +59,10 @@ interface InnerProps {
 interface Props {
   training?: any;
   onAdded: Function;
+  onCancel: Function;
 }
 
 interface State {
-  tCopy: any;
   trainingBlocks: any[];
   modal: boolean;
   tBlockToEdit: any;
@@ -70,7 +70,6 @@ interface State {
 
 class TrainingForm extends React.Component<Props & InnerProps, State> {
   state: State = {
-    tCopy: {},
     trainingBlocks: [],
     modal: false,
     tBlockToEdit: {}
@@ -85,21 +84,10 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
     }
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    const props = this.props;
-    if (nextProps.training && props.training && nextProps.training._id === props.training._id) {
-      return;
-    }
-    if (!nextProps.training && !props.training) {
-      return;
-    }
-    this.setState({ tCopy: nextProps.training || {} });
-  }
-
   render() {
     console.log('TrainingForm rendered');
     const { getFieldDecorator } = this.props.form;
-    const tCopy = this.state.tCopy;
+    const tCopy = Object.assign(this.props.training || {}, {});
 
     const tBlocks = [<Select.Option key={'Create new Training Block'} >Create new Training Block</Select.Option>];
 
@@ -197,10 +185,10 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
         </Timeline>
         <div className="login-form-button-group">
           <Button type="primary" htmlType="submit" className="login-form-button">
-            <span style={{ letterSpacing: 1.5, fontWeight: 'bold' }} >{this.state.tCopy.type ? 'SAVE' : 'ADD'}</span>
+            <span style={{ letterSpacing: 1.5, fontWeight: 'bold' }} >{tCopy.type ? 'SAVE' : 'ADD'}</span>
           </Button>
-          {this.state.tCopy.type ?
-            <Button type="danger" onClick={() => this.setState({ tCopy: {} })} className="login-form-button">
+          {tCopy.type ?
+            <Button type="danger" onClick={() => this.props.onCancel()} className="login-form-button">
               <span style={{ letterSpacing: 1.5, fontWeight: 'bold' }} >CANCEL</span>
             </Button>
             : null
