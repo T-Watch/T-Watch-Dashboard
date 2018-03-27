@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { Form, Radio, Icon, Tooltip, InputNumber, Button } from 'antd';
+import { Form, Radio, Icon, Tooltip, InputNumber, Button, message } from 'antd';
 import moment from 'moment';
 import { Query } from 'react-apollo';
 import { withApollo, graphql, compose } from 'react-apollo';
@@ -13,16 +13,6 @@ query Query($coach: String) {
    _id,
    type,
    monthlyPrice
-  }
-}`;
-const query = gql`
-query Query($email: String!) {
-  user(email: $email){
-    name
-    lastName
-    phoneNumber
-    district
-    province
   }
 }`;
 
@@ -40,8 +30,6 @@ interface HireCoachPropsFull extends HireCoachProps {
 interface CoachState {
      isActiveModal: boolean;
      email: string;
-     district: string;
-     province: string;
      close: Function;
   }
 
@@ -53,8 +41,6 @@ constructor(props: HireCoachPropsFull & ApolloProps) {
     this.state = {
         isActiveModal: false,
         email: this.props.email,
-        province: '',
-        district: '',
         close: this.props.close
       };
 }
@@ -69,45 +55,27 @@ toggleModal = () => {
     });
 }
 
-async componentDidMount() {
-    const email = localStorage.getItem('email');
-    try {
-    const {data} = await this.props.client.query({
-      query,
-      variables: {
-        email: email
-      }
-    });
-    this.setState({district: data.user.district});
-    this.setState({province: data.user.province});
-    
-}catch(e){
-    console.error(e);
-  }
-  }
-
 handleSubmit = (e: any) => {
     e.preventDefault();
 
     this.props.form.validateFields((err: any, values: any) => {
         const month = values.numberOfMonths;
-        const diff = moment().add('months', month);
+        const diff = moment().add(month, 'months');
         delete values.numberOfMonths;
         values.plan.dueDate = diff.toDate();
-        values.district = this.state.district;
-        values.province = this.state.province;
         values.email = localStorage.getItem('email');
-      //  values.plan.plan = idPlan;
-      console.log(values);
+        // console.log(values);
         if (!err) {
             this.props.mutate({
                variables: { updatePlan: values }
             })
             .then(({ data }: any) => {
-                console.log('got data');
-                console.log(data);
+                message.info('Proximamente se habilitará una plataforma de pago.');
+                message.success('Entrenador/a contratad@!');
+                // console.log('got data');
               }).catch((error: any) => {
-                console.log('there was an error sending the query', error);
+                message.error('Error al contratar el/la entrenador/a');
+                // console.log('there was an error sending the query', error);
               });
            
         }
@@ -260,10 +228,6 @@ mutation Mutation($updatePlan: UpdateUserInput!){
 }
 `;
 
- //export default Form.create()(HireCoach);
-//export default Form.create()(withApollo<HireCoachProps, {}>(HireCoach as any));
-
-// export default Form.create()(graphql<{}, HireCoachPropsFull>(hireCoachMutation)(HireCoach as any));
 export default Form.create()(compose(
     withApollo,
     graphql<{}, HireCoachPropsFull>(hireCoachMutation),

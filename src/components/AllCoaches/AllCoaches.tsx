@@ -1,6 +1,5 @@
 import * as React from 'react';
-import { Row, Col, List, Avatar, Icon, Layout } from 'antd';
-import {  ShowTargets } from '../../components';
+import {  ShowCardsCoach } from '../../components';
 import { withApollo } from 'react-apollo';
 import { gql } from 'apollo-boost';
 
@@ -11,15 +10,11 @@ interface AllCoachesState {
   email: string;
   coaches: object[];
 }
-interface AllCoachesObject {
-    name: string;
-    lastName: string;
-}
 interface ApolloProps {
   client: any;
 }
 
-class Coach extends React.Component<AllCoachesProps & ApolloProps,
+class AllCoaches extends React.Component<AllCoachesProps & ApolloProps,
 AllCoachesState> {
   constructor(props: AllCoachesProps & ApolloProps) {
     super(props);
@@ -46,7 +41,7 @@ initCoaches = async () => {
       coaches: data.coaches
       });
   } catch (e) {
-    console.log(e.message);
+    // console.log(e.message);
   }
   
   }
@@ -54,7 +49,7 @@ initCoaches = async () => {
     return (
 
         <div>
-        <ShowTargets 
+        <ShowCardsCoach 
             coaches={this.state.coaches} 
         />            
         </div>
@@ -62,4 +57,4 @@ initCoaches = async () => {
   }
 }
 
-export default withApollo<{}, {}>(Coach as any);
+export default withApollo<{}, {}>(AllCoaches as any);

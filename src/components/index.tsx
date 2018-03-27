@@ -5,10 +5,14 @@ import TrainingForm from './TrainingForm';
 import Coach from './Coach/Coach';
 import AllCoaches from './AllCoaches/AllCoaches';
 import CoachCard from './CoachCard/CoachCard';
-import ShowTargets from './ShowTargets/ShowTargets';
+import ShowCardsCoach from './ShowCardsCoach/ShowCardsCoach';
+import ShowCardsUsers from './ShowCardsUsers/ShowCardsUsers';
 import HireCoach from './HireCoach/HireCoach';
 import PlanCard from './PlanCard/PlanCard';
 import UpdatePlan from './UpdatePlan/UpdatePlan';
+import MyCoaches from './MyCoaches/MyCoaches';
+import MyUsers from './MyUsers/MyUsers';
+import UserCard from './UserCard/UserCard';
 export {
   Card,
   InboxMessage,
@@ -17,8 +21,12 @@ export {
   Coach,
   AllCoaches,
   CoachCard,
-  ShowTargets,
+  ShowCardsCoach,
+  ShowCardsUsers,
   HireCoach,
   PlanCard,
-  UpdatePlan
+  UpdatePlan,
+  MyCoaches,
+  MyUsers,
+  UserCard
 };

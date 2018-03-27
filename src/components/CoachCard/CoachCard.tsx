@@ -1,43 +1,20 @@
 import React from 'react';
-import { Card, Modal, Icon } from 'antd';
+import { Card, Icon } from 'antd';
 import './CoachCard.css';
 
 interface CoachCardProps {
     name: string;
     lastName: string;
-    description: string;
-    photo: string;
-    location: string;
-    type: string;  
+    // photo: string;
+    province: string;
+    district: string;
     email: string;  
     fields: string[];    
 }
 
-interface CoachCardState {
-    name: string;
-    lastName: string;
-    description: string;
-    photo: string;
-    isActive: boolean;
-    location: string;
-    type: string;
-    email: string;
-    fields: string[];
-}
-export default class CoachCard extends React.Component <CoachCardProps, CoachCardState > {
+export default class CoachCard extends React.Component <CoachCardProps, any > {
     constructor(props: CoachCardProps) {
         super(props);
-        this.state = {
-            email: this.props.email,
-            name: this.props.name,
-            lastName: this.props.lastName,
-            description: this.props.description,
-            photo: this.props.photo,
-            location: this.props.location,
-            type: this.props.type,
-            fields: this.props.fields,
-            isActive: false
-        };
     }
     toggleModal = () => {
         window.location.href =
@@ -48,7 +25,7 @@ export default class CoachCard extends React.Component <CoachCardProps, CoachCar
         return (
             <div className="card">
                 <Card 
-                    title={this.state.name + ' ' + this.state.lastName}
+                    title={this.props.name + ' ' + this.props.lastName}
                     extra={<span  
                             style={{
                             cursor: 'pointer',
@@ -59,8 +36,9 @@ export default class CoachCard extends React.Component <CoachCardProps, CoachCar
                     </span>}
                 >
                 
-                    <p><Icon type="mail" />   {this.state.description}</p>
-                    <p><Icon type="pushpin-o" />   {this.state.fields.toString()}</p>
+                    <p><Icon type="mail" />   {this.props.email}</p>
+                    <p><Icon type="compass" />   {this.props.district} - ({this.props.province})</p>                    
+                    <p><Icon type="pushpin-o" />   {this.props.fields.toString()}</p>
                 </Card>
                 
             </div>

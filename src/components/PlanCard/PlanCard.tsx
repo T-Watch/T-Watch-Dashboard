@@ -25,7 +25,7 @@ export default class PlanCard extends React.Component <PlanCardProps, PlanCardSt
         this.setState({
             isActive: !this.state.isActive
         });
-        console.log(this.state.isActive);
+        // console.log(this.state.isActive);
         /*if (this.state.isActive === true) {
             window.location.href =
             'http://localhost:3000/billing';

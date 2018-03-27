@@ -1,10 +1,10 @@
 import * as React from 'react';
 import { Row, Col } from 'antd';
-import { Query } from 'react-apollo';
 import { PlanCard } from '../../components';
 import { withApollo } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { Card  } from '../../components';
+import { MyUsers } from '../../components';
 
 const query = gql`
 query Query($coach: String) {
@@ -47,7 +47,7 @@ CoachesState> {
       }
     });
     const plans = data.plans;
-    console.log(plans);
+   // console.log(plans);
 
     for (var i = 0; i < plans.length; i++) {
         if (plans[i].type === 'BASIC') {
@@ -58,9 +58,8 @@ CoachesState> {
             this.setState({premiumPrice: plans[i].monthlyPrice});
         }
     }
-    console.log(this.state.basicPrice);
-  }catch(e){
-    console.error(e);
+  } catch (e) {
+   // console.error(e);
   }
   }
   
@@ -77,7 +76,7 @@ CoachesState> {
         </Col>
         <Col className="gutter-row" span={12}>
           <Card title="My users" icon="star" >
-            <p style={{textAlign: 'center'}}>Any user yet</p>
+          <MyUsers/>
           </Card>
         </Col>
       </Row>

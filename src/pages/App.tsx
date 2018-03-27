@@ -93,7 +93,7 @@ class App extends React.Component<ApolloProps, State> {
               return (<span>Loading...</span>);
             }
             if (!error && data) {
-              console.log(data);
+             // console.log(data);
               const user = (data as any).user;
               localStorage.setItem('type', user.type);
               const avatarProps = {

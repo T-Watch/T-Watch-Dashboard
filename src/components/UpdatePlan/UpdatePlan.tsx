@@ -142,6 +142,6 @@ mutation Mutation($updatePlan: PlanInput){
 }
 `;
 
-//export default Form.create()(UpdatePlan);
+// export default Form.create()(UpdatePlan);
 // export default Form.create()(withApollo<UpdatePlanPropsFull, {}>(UpdatePlan as any));
 export default Form.create()(graphql<{}, UpdatePlanPropsFull>(updatePlanMutation)(UpdatePlan as any));

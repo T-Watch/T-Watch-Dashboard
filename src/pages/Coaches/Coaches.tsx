@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { Row, Col, List } from 'antd';
-import { Query } from 'react-apollo';
-
+import { Row, Col } from 'antd';
 import { withApollo } from 'react-apollo';
 import { gql } from 'apollo-boost';
 import { Card, AllCoaches } from '../../components';
 import { Coach } from '../../components';
+import MyCoaches from '../../components/MyCoaches/MyCoaches';
 
 const query = gql`
 query Query($email: String!) {
@@ -27,7 +26,7 @@ interface CoachesProps {
   email: string;
 }
 interface CoachesState {
-  coach: CoachObject?;
+  coach: CoachObject | null;
 }
 interface ApolloProps {
   client: any;
@@ -62,8 +61,8 @@ CoachesState> {
       }
     });
     this.setState({coach: res.data.user});
-  }catch(e){
-    console.error(e);
+  } catch (e) {
+    // console.error(e);
   }
   }
   
@@ -142,6 +141,7 @@ getAge = (birthdayDate: Date) => { // birthday is a date
           <Card title="My coaches" icon="star" >
             <p style={{textAlign: 'center'}}>Any coach yet</p>
             <p style={{textAlign: 'center'}}>What do you waiting for?</p>
+            <MyCoaches/>
           </Card>
         </Col>
       </Row>
