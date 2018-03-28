@@ -30,7 +30,7 @@ export default class UserCard extends React.Component <CoachCardProps, any > {
                     <p><Icon type="mobile" />   {this.props.phoneNumber}</p>
                     <p><Icon type="compass" />   {this.props.district} - ({this.props.province})</p>
                   
-                    <p><Icon type="mobile" />   
+                    <p><Icon type="calendar" />   
                     Suscrito hasta el&nbsp;
                      {dueDateFormat.getDate()}-{dueDateFormat.getMonth() + 1}-{dueDateFormat.getFullYear()}</p>
                     
