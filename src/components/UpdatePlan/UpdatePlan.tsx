@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Form, InputNumber, Button } from 'antd';
-import { graphql } from 'react-apollo';
+import { withApollo, graphql, compose } from 'react-apollo';
 import { gql } from 'apollo-boost';
 const FormItem = Form.Item;
 
@@ -16,58 +16,76 @@ interface UpdatePlanPropsFull extends UpdatePlanProps {
     mutate: Function;
 }
 interface UpdatePlanState {
-    type: string;
-    monthlyPrice: number;  
-    coach: string;
+    monthlyPrice: number;
     close: Function;
-  }
+    _id: string;
+}
 
-class UpdatePlan extends React.Component<UpdatePlanPropsFull,
+interface ApolloProps {
+    client: any;
+  }
+const query = gql`
+  query Query($coach: String) {
+    plans(coach: $coach){
+      _id
+      type
+    }
+  }`;
+
+class UpdatePlan extends React.Component<UpdatePlanPropsFull & ApolloProps,
 UpdatePlanState> {
 
-constructor(props: UpdatePlanPropsFull) {
+constructor(props: UpdatePlanPropsFull & ApolloProps) {
     super(props);
     this.state = {
-        coach: this.props.coach,
-        type: this.props.type,
         monthlyPrice: this.props.monthlyPrice,
-        close: this.props.close
+        close: this.props.close,
+        _id: ''
       };
 }
 
-handleHire = () => {
-    //
-  }
+async componentDidMount() {
+
+    if (this.props.monthlyPrice !== 0) {
+    try {
+        const { data } = await this.props.client.query({
+          query,
+          variables: {
+            coach: this.props.coach
+          }
+        });
+        const plans = data.plans;
+        for (const plan of plans) {
+            if (plan.type === this.props.type) {
+             this.setState({ _id: plan._id});   
+            }
+        }
+     } catch (e) {
+         console.error(e);
+      }
+    
+}
+}
 
 handleSubmit = (e: any) => {
     e.preventDefault();
 
     this.props.form.validateFields((err: any, values: any) => {
+        if (this.props.monthlyPrice !== 0) {
+        values._id = this.state._id;
+        }
         values.coach = this.props.coach;
         values.type = this.props.type;
-        console.log(values);
-      //  values.plan.plan = idPlan;
+        const newMonthlyPrice = values.monthlyPrice;
         if (!err) {
-            this.props.mutate({
+           this.props.mutate({
                 variables: { updatePlan: values }
             })
             .then(({ data }: any) => {
-                console.log(data);
-                this.state.close();
+                this.state.close(newMonthlyPrice);
               }).catch((error: any) => {
                 console.log('there was an error sending the query', error);
               });
-           // console.log('Usuario: \n', values);
-            /*this.props.mutate({
-                variables: { user: values }
-            })
-            .then(({ data }: any) => {
-              //  console.log('got data');
-              }).catch((error: any) => {
-             //   console.log('there was an error sending the query', error);
-              });
-          //  this.state.close();
-            // console.log('Received values of form: ', values);*/
         }
     });
 }
@@ -110,7 +128,7 @@ render() {
       <Form onSubmit={this.handleSubmit}>
                 <FormItem {...formItemLayout} label="Añadir precio mensual">
             {getFieldDecorator('monthlyPrice', {
-                initialValue: 1,
+                initialValue: this.props.monthlyPrice,
                 rules: [
                     {
                         required: true,
@@ -144,4 +162,8 @@ mutation Mutation($updatePlan: PlanInput){
 
 // export default Form.create()(UpdatePlan);
 // export default Form.create()(withApollo<UpdatePlanPropsFull, {}>(UpdatePlan as any));
-export default Form.create()(graphql<{}, UpdatePlanPropsFull>(updatePlanMutation)(UpdatePlan as any));
+// export default Form.create()(graphql<{}, UpdatePlanPropsFull>(updatePlanMutation)(UpdatePlan as any));
+export default Form.create()(compose(
+    withApollo,
+    graphql<{}, UpdatePlanPropsFull>(updatePlanMutation),
+ )(UpdatePlan as any));

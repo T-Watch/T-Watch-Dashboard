@@ -9,38 +9,44 @@ interface PlanCardProps {
 }
 
 interface PlanCardState {
-    
+    monthlyPrice: number;
     isActive: boolean;
 }
 export default class PlanCard extends React.Component <PlanCardProps, PlanCardState > {
     constructor(props: PlanCardProps) {
         super(props);
         this.state = {
-            isActive: false
+            isActive: false,
+            monthlyPrice: this.props.monthlyPrice
         };
-
     }
 
+async componentDidMount() {
+    this.setState({
+        monthlyPrice: this.props.monthlyPrice
+    });
+  
+}
     toggleModal = () => {
         this.setState({
             isActive: !this.state.isActive
         });
-        // console.log(this.state.isActive);
-        /*if (this.state.isActive === true) {
-            window.location.href =
-            'http://localhost:3000/billing';
-        }*/
     }
-    endModal = () => {
+    endModal = (newMonthlyPrice: number) => {
         this.setState({
             isActive: !this.state.isActive
         });
-       
-        window.location.href =
-            'http://localhost:3000/billing';
-
+        this.setState({
+            monthlyPrice: newMonthlyPrice
+        });
     }
-    render() {
+    componentWillReceiveProps(nextProps: any) {
+        this.setState({
+            monthlyPrice: nextProps.monthlyPrice
+        });
+    }
+
+    render() {      
         return (
             <div >
                 <Card 
@@ -55,7 +61,7 @@ export default class PlanCard extends React.Component <PlanCardProps, PlanCardSt
                     </span>}
                 >
                 
-                    <p><Icon type="credit-card" />  {this.props.monthlyPrice} €/mes</p>
+                    <p><Icon type="credit-card" />  {this.state.monthlyPrice} €/mes</p>
                 </Card>
 
                     <Modal zIndex={2} visible={this.state.isActive} onCancel={this.toggleModal} footer={null}>
@@ -71,7 +77,7 @@ export default class PlanCard extends React.Component <PlanCardProps, PlanCardSt
                         close={this.endModal}
                         coach={this.props.coach} 
                         type={this.props.type} 
-                        monthlyPrince={this.props.monthlyPrice}
+                        monthlyPrice={this.state.monthlyPrice}
                     />
                 </Modal>
             </div>

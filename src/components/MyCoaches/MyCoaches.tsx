@@ -69,7 +69,7 @@ async componentDidMount() {
         // console.error(e);
       }
   
-  }
+}
 
 async getCoach() {
 
