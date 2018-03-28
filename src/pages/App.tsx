@@ -4,6 +4,7 @@ import { gql } from 'apollo-boost';
 import { Layout, Menu, Icon, Avatar } from 'antd';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Trainings from './Trainings';
+import TrainingsUser from './TrainingsUser';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
 import Coaches from './Coaches/Coaches';
@@ -58,7 +59,13 @@ class App extends React.Component<ApolloProps, State> {
           page = <Dashboard />;
           break;
         case 'trainings':
-          page = <Trainings />;
+       if (localStorage.getItem('type') === 'COACH') {
+        page = <Trainings />;
+       } else if (localStorage.getItem('type') === 'USER') {
+        page = <TrainingsUser />;
+
+       }
+
           break;
         case 'coaches':
         let idCoach = '';
@@ -117,12 +124,10 @@ class App extends React.Component<ApolloProps, State> {
                         <Link to="/dashboard"><Icon type="dashboard" /></Link>
                         <span>Dashboard</span>
                       </Menu.Item>
-                      {localStorage.getItem('type') === 'COACH' ?
                         <Menu.Item key="trainings">
                           <Link to="/trainings"><Icon type="solution" /></Link>
                           <span>Trainings</span>
-                        </Menu.Item> : null
-                      }
+                        </Menu.Item> 
                       {localStorage.getItem('type') === 'COACH' ?
                         <Menu.Item key="customers">
                           <Link to="/customers"><Icon type="team" /></Link>

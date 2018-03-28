@@ -61,7 +61,7 @@ async componentDidMount() {
             }
         }
      } catch (e) {
-         console.error(e);
+       //  console.error(e);
       }
     
 }
@@ -84,7 +84,7 @@ handleSubmit = (e: any) => {
             .then(({ data }: any) => {
                 this.state.close(newMonthlyPrice);
               }).catch((error: any) => {
-                console.log('there was an error sending the query', error);
+               // console.log('there was an error sending the query', error);
               });
         }
     });
