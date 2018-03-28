@@ -9,7 +9,7 @@ import './TrainingForm.css';
 const FormItem = Form.Item;
 
 const mutation = gql`
-  mutation Mutation ($training: TrainingInput!) {
+  mutation Mutation ($training: TrainingInput!, $_ids: [String!]!) {
     training (input: $training){
       _id
       type
@@ -31,6 +31,7 @@ const mutation = gql`
       }
       completed
     }
+    deleteTrainingBlocks (_ids: $_ids)
   }
 `;
 
@@ -78,7 +79,11 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
   async componentDidMount() {
     try {
       const { data } = await this.props.client.query({ query, variables: { coach: localStorage.getItem('email') } });
-      this.setState({ trainingBlocks: data.trainingBlocks });
+      let extra = [];
+      if (this.props.training) {
+        extra = this.props.training.trainingBlocks;
+      }
+      this.setState({ trainingBlocks: [...data.trainingBlocks.filter((e: any) => e.schema), ...extra] });
     } catch (e) {
       console.error(e);
     }
@@ -143,9 +148,24 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
             rules: [{ required: true }],
             initialValue: tCopy.trainingBlocks ? tCopy.trainingBlocks.map((e: any) => e._id) : undefined,
             normalize: (v: any, pv: any, allvalues: any) => {
-              if (v && v[v.length - 1] === 'Create new Training Block') {
-                this.setState({ modal: true });
-                return v.filter((e: any) => e !== 'Create new Training Block');
+              if (v) {
+                const tb = v[v.length - 1];
+                if (!tb) {
+                  return v;
+                }
+                if (tb === 'Create new Training Block') {
+                  this.setState({ modal: true });
+                  return v.filter((e: any) => e !== 'Create new Training Block');
+                }
+                const o = { ...this.state.trainingBlocks.filter((e: any) => e._id === tb)[0] };
+                if (o.schema) {
+                  delete o._id;
+                  delete o.schema;
+                  this.editTBlock(o);
+                  return v.filter((e: any) => e !== 'Create new Training Block' && e !== tb);
+                } else {
+                  return v;
+                }
               }
               return v;
             }
@@ -229,11 +249,15 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
         if (this.props.training && this.props.training._id) {
           values._id = this.props.training._id;
         }
+        const tBlocksToRemove = this.state.trainingBlocks.filter((t: any) =>
+          !t.schema && values.trainingBlocks.indexOf(t._id) === -1).map((t: any) => t._id);
         try {
           const res = await this.props.client.mutate({
             mutation,
-            variables: { training: values }
+            variables: { training: values, _ids: tBlocksToRemove }
           });
+          this.state.trainingBlocks = this.state.trainingBlocks.filter((t: any) =>
+            t.schema || values.trainingBlocks.indexOf(t._id) !== -1);
           this.props.form.resetFields();
           this.props.onAdded();
           console.log(res);

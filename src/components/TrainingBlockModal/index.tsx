@@ -139,7 +139,7 @@ class TrainingBlockModal extends React.Component<Props & InnerProps, State> {
             variables: { trainingBlock: values }
           });
           this.props.form.resetFields();
-          if (this.props.tBlock.title) {
+          if (this.props.tBlock._id) {
             this.props.onUpdated(res.data.trainingBlock);
           } else {
             this.props.onCreated(res.data.trainingBlock);
