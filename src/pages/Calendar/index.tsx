@@ -8,12 +8,13 @@ import { Card } from '../../components';
 import './Calendar.css';
 
 const query = gql`
-  query Q($coach: String, $user: String, $since: Date!){
-    trainings(coach: $coach, user: $user, since: $since){
+  query Q($coach: String, $user: String, $date: Date!){
+    trainings(coach: $coach, user: $user, month: $date){
       user
       date
       completed
       _id
+      type
       trainingBlocks {
         _id
       }
@@ -40,10 +41,7 @@ class CalendarPage extends React.Component<Props, State> {
   public render() {
     console.log('Calendar rendered');
 
-    const sinceDate = new Date(this.state.selectedDate.toUTCString());
-    sinceDate.setDate(1);
-
-    const variables: any = { since: sinceDate.toUTCString() };
+    const variables: any = { date: this.state.selectedDate };
     if (localStorage.getItem('type') === 'COACH') {
       variables.coach = localStorage.getItem('email');
     } else {
@@ -60,6 +58,7 @@ class CalendarPage extends React.Component<Props, State> {
             return (<span>Loading...</span>);
           }
           if (!error && data) {
+            console.log(data);
             const selectedDateTrainings = data.trainings
               .filter((t: any) => moment(this.state.selectedDate).isSame(new Date(t.date), 'day'))
               .map((t: any) => {
@@ -78,9 +77,7 @@ class CalendarPage extends React.Component<Props, State> {
                         style={{ cursor: 'pointer', textDecoration: color === 'grey' ? 'line-through' : 'none' }}
                       >
                         {localStorage.getItem('type') === 'COACH' ?
-                          <span>{t.user}</span> : <span>{t.trainingBlocks.length} Training Blocks</span>}
-                        {t.description && localStorage.getItem('type') === 'COACH' ? <span> - </span> : null}
-                        <span>{t.description}</span>
+                          <span>{`${t.user} - ${t.type}`}</span> : <span>{t.type}</span>}
                       </span>
                     </Link>
                   </Timeline.Item>
@@ -136,7 +133,7 @@ class CalendarPage extends React.Component<Props, State> {
                   style={item.completed ? { textDecoration: 'line-through' } : {}}
                   status={status}
                   text={localStorage.getItem('type') === 'COACH' ?
-                  item.user : `${item.trainingBlocks.length} Training Blocks`}
+                    `${item.user} - ${item.type}` : `${item.type}`}
                 />
               </li>
             );

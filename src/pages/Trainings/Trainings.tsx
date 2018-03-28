@@ -58,6 +58,9 @@ class Trainings extends React.Component<Props, State> {
 
             if (q.get('edit')) {
               trainingToEdit = trainings.filter((e: any) => e._id === q.get('edit'))[0];
+              if (trainingToEdit.completed) {
+                trainingToEdit = undefined;
+              }
             }
 
             return (
