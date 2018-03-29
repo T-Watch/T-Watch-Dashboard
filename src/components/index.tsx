@@ -13,6 +13,7 @@ import UpdatePlan from './UpdatePlan/UpdatePlan';
 import MyCoaches from './MyCoaches/MyCoaches';
 import MyUsers from './MyUsers/MyUsers';
 import UserCard from './UserCard/UserCard';
+import TrainingGraphics from './TrainingGraphics/TrainingGraphics';
 export {
   Card,
   InboxMessage,
@@ -28,5 +29,6 @@ export {
   UpdatePlan,
   MyCoaches,
   MyUsers,
-  UserCard
+  UserCard,
+  TrainingGraphics
 };

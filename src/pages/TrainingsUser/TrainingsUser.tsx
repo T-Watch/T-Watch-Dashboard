@@ -1,8 +1,9 @@
 import * as React from 'react';
 import { Query, graphql } from 'react-apollo';
 import { gql } from 'apollo-boost';
-import { Table, Row, Col, Icon } from 'antd';
-import { Card, TrainingForm } from '../../components';
+import { withApollo } from 'react-apollo';
+import { Row, Col, Icon, List, Avatar } from 'antd';
+import { Card, TrainingGraphics } from '../../components';
 import { ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 
 const query = gql`
@@ -36,84 +37,105 @@ const query = gql`
     }
   }
 `;
+interface TrainingsUserState {
+  training: any;
+  trainings: any[];
+  trainingsList: any[];
+}
+interface ApolloProps {
+  client: any;
+}
+class TrainingsUser extends React.Component<ApolloProps, TrainingsUserState> {
+  
+  state: TrainingsUserState = {
+    training: null,
+    trainings: [],
+    trainingsList: []
+  };
+  seeTraining = (index: number) => {
+    this.setState({training: this.state.trainings[index]});
+  }
+  async componentDidMount() {
 
-class TrainingsUser extends React.Component<any, any> {
+    try {
+    const { data } = await this.props.client.query({
+      query,
+      variables: {
+        email: localStorage.getItem('email'),
+        completed: true
+            }
+    });
+    const trainings = data.trainings;
+    this.setState({trainings: trainings});
+    this.setState({training: trainings[trainings.length - 1]});
+
+    let trainingsList = [];
+    for (const training of trainings) {
+      let tDate = new Date(training.lastModified);
+      let itemList = {
+        description: training.description, 
+        date: tDate.getDate() + '-' + (tDate.getMonth() + 1) + '-' + tDate.getFullYear(),
+        type: training.type
+      };
+      trainingsList.push(itemList);
+    }
+    this.setState({trainingsList: trainingsList});
+
+  } catch (e) {
+    // console.error(e);
+  }
+  }
 
   render() {
+    let trainingDate = new Date();
+    if (this.state.training) {
+       trainingDate = new Date(this.state.training.lastModified); 
+    }
     return (
-      <Query
-        query={query}
-        variables={{
-          email: localStorage.getItem('email'),
-          completed: true
-        } as any}
-      >
-        {({ loading, error, data }) => {
-          if (loading) {
-            return (<span>Loading...</span>);
-          }
-          if (!error && data) {
-            const trainings = (data as any).trainings; 
-            const lastTraining = trainings[trainings.length - 1];
-            const trainingDate = new Date(lastTraining.lastModified);
-            const trainingDateString =
-           
-            console.log(lastTraining);
-            
-            let HRspeed = [{HR: 0, speed: 0}];
-            for (const tb of lastTraining.trainingBlocks) {
-            for (const tbr of tb.result) {
-            
-              let date = {HR: tbr.HR, speed: tbr.speed };
-              HRspeed.push(date);
-            }
-            }
-            return (
               <div>
                 <Row gutter={12}>
-                <Col span={6}>
-                    <Card title="Trainings">                
-                    <p>pendientes </p>
-                    
+                <Col span={8}>
+                    <Card title="Trainings">     
+                  {this.state.trainings ?
+                               
+                    <List
+                      size="small"
+                      bordered={true}
+                      dataSource={this.state.trainingsList}
+                      renderItem={(item,index) => (
+                        <List.Item 
+                          actions={[ <a  key={index} onClick={() => this.seeTraining(index)}> 
+                          see more 
+                          </a>]}
+                        >
+                          <List.Item.Meta
+                            title={item.type + '  ' + item.date}
+                            description={item.description}
+                          />
+                        </List.Item>
+                      )}
+                    />   
+                    : null}                 
                     </Card>
+
                   </Col>
                   <Col span={12}>
+                  {this.state.training ?                  
                   <Card 
-                    title = {'Last Training  ' + trainingDate.getDate() + '-' + 
+                    title={'Last Training  ' + trainingDate.getDate() + '-' + 
                     (trainingDate.getMonth() + 1) + '-' + trainingDate.getFullYear()} 
-                    > 
-                     <Card title="HR - speed">
-
-                    <ScatterChart width={300} height={300} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
-                      <XAxis dataKey={'HR'} type="number" name="HR" unit="bpm"/>
-                      <YAxis dataKey={'speed'} type="number" name="speed" unit="km/h"/>
-                      <CartesianGrid />
-                      <Scatter name="HR - speed" data={HRspeed} fill="#8884d8"/>
-                      <Tooltip cursor={{strokeDasharray: '3 3'}}/>
-                    </ScatterChart>
-                    </Card>
-                    <Card title="HR2 - speed">
-
-                    <ScatterChart width={300} height={300} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
-                      <XAxis dataKey={'HR'} type="number" name="HR" unit="bpm"/>
-                      <YAxis dataKey={'speed'} type="number" name="speed" unit="km/h"/>
-                      <CartesianGrid />
-                      <Scatter name="HR - speed" data={HRspeed} fill="#8884d8"/>
-                      <Tooltip cursor={{strokeDasharray: '3 3'}}/>
-                    </ScatterChart>
-                    </Card>
-                    </Card>
+                  > 
+                  <TrainingGraphics training={this.state.training}/>
+                  </Card>
+                  : <Card title="Loading Training"> 
+                    Loading <Icon type="loading" spin={true} />
+                  </Card> }
                   </Col>
                  
                   </Row>
-              </div>
-            );
-          }
-          return <span>{error}</span>;
-        }}
-      </Query>
+              </div>  
     );
   }
 }
 
-export default TrainingsUser;
+export default withApollo<{}, {}>(TrainingsUser as any);
