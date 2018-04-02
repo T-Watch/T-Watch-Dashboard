@@ -41,11 +41,11 @@ class App extends React.Component<ApolloProps, State> {
 
   public render() {
     console.log('App rendered');
-    if (!localStorage.getItem('token')) {
-      return <Login redirect={() => this.forceUpdate()} />;
-    }
-    const queryComponent = (router: any) => {      
+    const queryComponent = (router: any) => {
       const q = new URLSearchParams(router.location.search);
+      if (!localStorage.getItem('token') && !q.get('token')) {
+        return <Login redirect={() => this.forceUpdate()} />;
+      }
       if (q.get('token')) {
         localStorage.setItem('token', q.get('token') as string);
         localStorage.setItem('type', q.get('type') as string);
@@ -59,32 +59,30 @@ class App extends React.Component<ApolloProps, State> {
           page = <Dashboard />;
           break;
         case 'trainings':
-       if (localStorage.getItem('type') === 'COACH') {
-        page = <Trainings />;
-       } else if (localStorage.getItem('type') === 'USER') {
-        page = <TrainingsUser />;
-
-       }
-
+          if (localStorage.getItem('type') === 'COACH') {
+            page = <Trainings />;
+          } else if (localStorage.getItem('type') === 'USER') {
+            page = <TrainingsUser />;
+          }
           break;
         case 'coaches':
-        let idCoach = '';
-        if (q.get('id')) {
-          idCoach = q.get('id') as string;
-        }
-        page = <Coaches email={idCoach} />;
-        break;
+          let idCoach = '';
+          if (q.get('id')) {
+            idCoach = q.get('id') as string;
+          }
+          page = <Coaches email={idCoach} />;
+          break;
         case 'billing':
-        const coachEmail = localStorage.getItem('email');
-        page = <Billing coach={coachEmail}/>
-        break;
+          const coachEmail = localStorage.getItem('email');
+          page = <Billing coach={coachEmail} />;
+          break;
         case 'logout':
           localStorage.removeItem('token');
           localStorage.removeItem('email');
           localStorage.removeItem('type');
           return <Login redirect={() => this.forceUpdate()} />;
-      
-        default:        
+
+        default:
           break;
       }
 
@@ -100,7 +98,7 @@ class App extends React.Component<ApolloProps, State> {
               return (<span>Loading...</span>);
             }
             if (!error && data) {
-             // console.log(data);
+              // console.log(data);
               const user = (data as any).user;
               localStorage.setItem('type', user.type);
               const avatarProps = {
@@ -124,10 +122,10 @@ class App extends React.Component<ApolloProps, State> {
                         <Link to="/dashboard"><Icon type="dashboard" /></Link>
                         <span>Dashboard</span>
                       </Menu.Item>
-                        <Menu.Item key="trainings">
-                          <Link to="/trainings"><Icon type="solution" /></Link>
-                          <span>Trainings</span>
-                        </Menu.Item> 
+                      <Menu.Item key="trainings">
+                        <Link to="/trainings"><Icon type="solution" /></Link>
+                        <span>Trainings</span>
+                      </Menu.Item>
                       {localStorage.getItem('type') === 'COACH' ?
                         <Menu.Item key="customers">
                           <Link to="/customers"><Icon type="team" /></Link>
@@ -149,7 +147,7 @@ class App extends React.Component<ApolloProps, State> {
                           <Link to="/coaches"><Icon type="team" /></Link>
                           <span>Coaches</span>
                         </Menu.Item> : null
-                      }                     
+                      }
                       <Menu.Item key="logout">
                         <Link to="/logout"><Icon type="logout" /></Link>
                         <span>Log out</span>
@@ -172,7 +170,7 @@ class App extends React.Component<ApolloProps, State> {
       <Router>
         <div>
           <Route exact={true} path="/" component={queryComponent} />
-          <Route path="/:page" component={queryComponent} /> 
+          <Route path="/:page" component={queryComponent} />
         </div>
       </Router >
     );
