@@ -4,6 +4,7 @@ import { gql } from 'apollo-boost';
 import { Layout, Menu, Icon, Avatar } from 'antd';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
 import Trainings from './Trainings';
+import Customers from './Customers/Customers';
 import TrainingsUser from './TrainingsUser';
 import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
@@ -76,6 +77,10 @@ class App extends React.Component<ApolloProps, State> {
           const coachEmail = localStorage.getItem('email');
           page = <Billing coach={coachEmail} />;
           break;
+          case 'customers':
+          page = <Customers/>;
+          break;
+
         case 'logout':
           localStorage.removeItem('token');
           localStorage.removeItem('email');

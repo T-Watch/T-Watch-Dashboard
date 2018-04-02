@@ -36,35 +36,57 @@ const query = gql`
     }
   }
 `;
-interface TrainingsUserState {
+
+const queryusers = gql`
+query Query($coach: String) {
+  users(coach: $coach){
+    name
+    lastName
+    phoneNumber
+    email
+    province
+    district
+    ...on User{
+      plan{
+        plan
+        dueDate
+      }
+    }
+  }
+}`;
+interface CustomersState {
   training: any;
   trainings: any[];
   trainingsList: any[];
+  users: any[];
 }
 interface ApolloProps {
   client: any;
 }
-class TrainingsUser extends React.Component<ApolloProps, TrainingsUserState> {
+class Customers extends React.Component<ApolloProps, CustomersState> {
   
-  state: TrainingsUserState = {
+  state: CustomersState = {
+    users: [],
     training: null,
     trainings: [],
     trainingsList: []
   };
+
   seeTraining = (index: number) => {
     this.setState({training: this.state.trainings[index]});
   }
-  async componentDidMount() {
+  
+  async seeTrainings (email: string) {
 
-    try {
     const { data } = await this.props.client.query({
-      query,
-      variables: {
-        email: localStorage.getItem('email'),
-        completed: true
+        query,
+        variables: {
+            email: email,
+            completed: true
             }
-    });
+        });
     const trainings = data.trainings;
+    
     this.setState({trainings: trainings});
     this.setState({training: trainings[trainings.length - 1]});
 
@@ -80,9 +102,27 @@ class TrainingsUser extends React.Component<ApolloProps, TrainingsUserState> {
     }
     this.setState({trainingsList: trainingsList});
 
-  } catch (e) {
-    // console.error(e);
-  }
+}
+
+  async componentDidMount() {
+
+      const coach = localStorage.getItem('email');
+      try {
+          const { data } = await this.props.client.query({
+            query: queryusers,
+            variables: {
+              coach: coach
+            }
+          });
+
+          this.setState({
+            users: data.users
+          });
+  
+        } catch (e) {
+          // console.error(e);
+        }
+
   }
 
   render() {
@@ -93,7 +133,31 @@ class TrainingsUser extends React.Component<ApolloProps, TrainingsUserState> {
     return (
               <div>
                 <Row gutter={12}>
-                <Col span={8}>
+                <Col span={6}>
+                <Card title="Users">     
+                  {this.state.users ?
+                               
+                    <List
+                      size="small"
+                      bordered={true}
+                      dataSource={this.state.users}
+                      renderItem={(item: any, index: any) => (
+                        <List.Item 
+                           extra={[ <a  key={index} onClick={() => this.seeTrainings(item.email)}> 
+                           see trainings 
+                          </a>]}
+                        >
+                          <List.Item.Meta
+                             title={item.name + '  ' + item.lastName}
+                             description={item.email}
+                          />
+                        </List.Item>
+                      )}
+                    />   
+                    : null}                 
+                    </Card>
+                  </Col>
+                  <Col span={6}>
                     <Card title="Trainings">     
                   {this.state.trainings ?
                                
@@ -103,9 +167,9 @@ class TrainingsUser extends React.Component<ApolloProps, TrainingsUserState> {
                       dataSource={this.state.trainingsList}
                       renderItem={(item: any, index: any) => (
                         <List.Item 
-                          actions={[ <a  key={index} onClick={() => this.seeTraining(index)}> 
+                          extra={[ <a  key={index} onClick={() => this.seeTraining(index)}> 
                           see more 
-                          </a>]}
+                         </a>]}
                         >
                           <List.Item.Meta
                             title={item.type + '  ' + item.date}
@@ -115,26 +179,25 @@ class TrainingsUser extends React.Component<ApolloProps, TrainingsUserState> {
                       )}
                     />   
                     : null}                 
-                    </Card>
+                    </Card> 
 
                   </Col>
                   <Col span={12}>
                   {this.state.training ?                  
-                  <Card 
+                   <Card 
                     title={'Last Training  ' + trainingDate.getDate() + '-' + 
                     (trainingDate.getMonth() + 1) + '-' + trainingDate.getFullYear()} 
-                  > 
+                   > 
                   <TrainingGraphics training={this.state.training}/>
-                  </Card>
-                  : <Card title="Loading Training"> 
-                    Loading <Icon type="loading" spin={true} />
-                  </Card> }
+                   </Card>
+                  : <Card title="Any training selected"> 
+                    Select a training 
+                   </Card> }
                   </Col>
-                 
                   </Row>
               </div>  
     );
   }
 }
 
-export default withApollo<{}, {}>(TrainingsUser as any);
+export default withApollo<{}, {}>(Customers as any);

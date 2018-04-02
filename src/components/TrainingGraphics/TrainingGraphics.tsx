@@ -35,6 +35,7 @@ class TrainingGraphics extends React.Component<any, TrainingGraphicsProps> {
             <Tooltip cursor={{strokeDasharray: '3 3'}}/>
         </ScatterChart>
     </Card>
+    
     </div>   
     );
   }
