@@ -79,11 +79,7 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
   async componentDidMount() {
     try {
       const { data } = await this.props.client.query({ query, variables: { coach: localStorage.getItem('email') } });
-      let extra = [];
-      if (this.props.training) {
-        extra = this.props.training.trainingBlocks;
-      }
-      this.setState({ trainingBlocks: [...data.trainingBlocks.filter((e: any) => e.schema), ...extra] });
+      this.setState({ trainingBlocks: data.trainingBlocks.filter((e: any) => e.schema) });
     } catch (e) {
       console.error(e);
     }
@@ -93,8 +89,11 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
     console.log('TrainingForm rendered');
     const { getFieldDecorator } = this.props.form;
     const tCopy = Object.assign(this.props.training || {}, {});
-
-    const tBlocks = [<Select.Option key={'Create new Training Block'} >Create new Training Block</Select.Option>];
+    
+    const tBlocks = [<Select.Option key={'Create new Training Block'} >Create new Training Block</Select.Option>,
+    [...this.state.trainingBlocks, ...(tCopy.trainingBlocks || [])].map((e: any) => (
+      <Select.Option key={e._id}>{e.title}</Select.Option>
+    ))];
 
     return (
       <Form onSubmit={this.handleSubmit}>
@@ -175,11 +174,7 @@ class TrainingForm extends React.Component<Props & InnerProps, State> {
               placeholder="Choose the blocks of this training"
               allowClear={true}
             >
-              {
-                tBlocks.concat(this.state.trainingBlocks.map((e: any) => (
-                  <Select.Option key={e._id}>{e.title}</Select.Option>
-                )))
-              }
+              {tBlocks}
             </Select>
           )}
         </FormItem>
