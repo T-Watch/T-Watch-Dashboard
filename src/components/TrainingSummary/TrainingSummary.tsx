@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Avatar, Icon } from 'antd';
 import { LineChart, Line, CartesianGrid, XAxis, ResponsiveContainer } from 'recharts';
+
 import * as Utils from '../../Utils';
 
 export interface TrainingSummaryProps {
