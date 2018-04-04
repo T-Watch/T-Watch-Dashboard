@@ -10,6 +10,7 @@ import Dashboard from './Dashboard/Dashboard';
 import Login from './Login/Login';
 import Coaches from './Coaches/Coaches';
 import Billing from './Billing/Billing';
+import Calendar from './Calendar';
 import './App.css';
 
 interface ApolloProps {
@@ -26,10 +27,6 @@ const userQuery = gql`
       type
       name
       photo
-    }
-    users (coach: $email) {
-      name
-      email
     }
   }
 `;
@@ -61,7 +58,7 @@ class App extends React.Component<ApolloProps, State> {
           break;
         case 'trainings':
           if (localStorage.getItem('type') === 'COACH') {
-            page = <Trainings />;
+            page = <Trainings router={router} />;
           } else if (localStorage.getItem('type') === 'USER') {
             page = <TrainingsUser />;
           }
@@ -80,13 +77,15 @@ class App extends React.Component<ApolloProps, State> {
           case 'customers':
           page = <Customers/>;
           break;
+        case 'calendar':
+          page = <Calendar />;
+          break;
 
         case 'logout':
           localStorage.removeItem('token');
           localStorage.removeItem('email');
           localStorage.removeItem('type');
-          return <Login redirect={() => this.forceUpdate()} />;
-
+          return <Login redirect={() => router.history.replace('/dashboard')} />;
         default:
           break;
       }
@@ -102,8 +101,8 @@ class App extends React.Component<ApolloProps, State> {
             if (loading) {
               return (<span>Loading...</span>);
             }
-            if (!error && data) {
-              // console.log(data);
+            if (!error && data && data.user) {
+              console.log(data);
               const user = (data as any).user;
               localStorage.setItem('type', user.type);
               const avatarProps = {

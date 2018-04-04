@@ -14,6 +14,7 @@ import MyCoaches from './MyCoaches/MyCoaches';
 import MyUsers from './MyUsers/MyUsers';
 import UserCard from './UserCard/UserCard';
 import TrainingGraphics from './TrainingGraphics/TrainingGraphics';
+import TrainingBlockModal from './TrainingBlockModal';
 export {
   Card,
   InboxMessage,
@@ -30,5 +31,6 @@ export {
   MyCoaches,
   MyUsers,
   UserCard,
-  TrainingGraphics
+  TrainingGraphics,
+  TrainingBlockModal
 };
