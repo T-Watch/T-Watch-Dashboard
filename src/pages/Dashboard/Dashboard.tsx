@@ -1,23 +1,22 @@
 import * as React from 'react';
-import { Row, Col, List } from 'antd';
-import { Card, InboxMessage, TrainingSummary } from '../../components';
+import { Row, Col, List, Icon } from 'antd';
+import { Query } from 'react-apollo';
+import { gql } from 'apollo-boost';
+import { Card, InboxMessage, TrainingSummary, MessageModal } from '../../components';
 import { InboxMessageProps } from '../../components/InboxMessage/InboxMessage';
 
-const fakeMessages: InboxMessageProps[] = [{
-  from: 'Brais',
-  subject: 'Necesito otro entrenamiento',
-  date: new Date()
-},
-{
-  from: 'Pichín',
-  subject: 'Estás despedido',
-  date: new Date()
-},
-{
-  from: 'María',
-  subject: 'Hola caracola',
-  date: new Date()
-}];
+const query = gql`
+  query Q($to: String!){
+    messages(to: $to){
+      _id
+      from
+      to
+      subject
+      date
+      body
+    }
+  }
+`;
 
 const lastTraining = {
   person: 'Brais',
@@ -36,34 +35,96 @@ const lastTraining = {
   ]
 };
 
-class Dashboard extends React.Component {
+interface State {
+  modal: boolean;
+  messageToShow: any;
+  skip: number;
+}
+
+class Dashboard extends React.Component<{}, State> {
+  state: State = {
+    modal: false,
+    messageToShow: undefined,
+    skip: 0
+  };
   render() {
+    const { skip } = this.state;
+
     return (
-          <Row gutter={40}>
-            <Col className="gutter-row" span={8}>
-              <Card title="Inbox" icon="inbox" >
-                <List
-                  size="small"
-                  dataSource={fakeMessages}
-                  renderItem={(item: InboxMessageProps) => (
-                    <InboxMessage {...item} />
-                  )}
-                />
-              </Card>
-            </Col>
-            <Col className="gutter-row" span={8}>
-              <Card title="Last training" icon="line-chart" >
-                <TrainingSummary {...lastTraining} />
-              </Card>
-            </Col>
-            <Col className="gutter-row" span={8}>
-              <Card title="inbox" icon="inbox" >
-                <p>Card content</p>
-                <p>Card content</p>
-                <p>Card content</p>
-              </Card>
-            </Col>
-          </Row>
+      <Row gutter={40}>
+        <Col className="gutter-row" span={8}>
+          <Card title="Inbox" icon="inbox" >
+            <Query
+              query={query}
+              variables={{ to: localStorage.getItem('email') }}
+            >
+              {({ loading, error, data }) => {
+                if (loading) {
+                  return (<span>Loading...</span>);
+                }
+                if (!error && data) {
+                  return (
+                    <div>
+                      <List
+                        size="small"
+                        dataSource={
+                          data.messages.slice(skip === 0 ? 0 : skip, skip === 0 ? 4 : skip + 4)
+                        }
+                        renderItem={(item: InboxMessageProps) => (
+                          <InboxMessage {...item} onClick={() => this.setState({ modal: true, messageToShow: item })} />
+                        )}
+                      />
+                      <div style={{ display: 'flex', justifyContent: 'space-evenly', marginTop: 15 }}>
+                        <Icon
+                          type="left"
+                          style={{
+                            visibility: this.state.skip === 0 ? 'hidden' : 'visible',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                          }}
+                          onClick={() => this.setState({ skip: this.state.skip - 5 })}
+                        />
+                        <Icon
+                          type="plus"
+                          style={{ cursor: 'pointer', fontWeight: 'bold' }}
+                          onClick={() => this.setState({ modal: true, messageToShow: undefined })}
+                        />
+                        <Icon
+                          type="right"
+                          onClick={() => this.setState({ skip: this.state.skip + 5 })}
+                          style={{
+                            visibility: this.state.skip <= data.messages.length ? 'hidden' : 'visible',
+                            cursor: 'pointer',
+                            fontWeight: 'bold'
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                }
+                return null;
+              }}
+            </Query>
+          </Card>
+        </Col>
+        <Col className="gutter-row" span={8}>
+          <Card title="Last training" icon="line-chart" >
+            <TrainingSummary {...lastTraining} />
+          </Card>
+        </Col>
+        <Col className="gutter-row" span={8}>
+          <Card title="inbox" icon="inbox" >
+            <p>Card content</p>
+            <p>Card content</p>
+            <p>Card content</p>
+          </Card>
+        </Col>
+        <MessageModal
+          onCancel={() => this.setState({ modal: false })}
+          visible={this.state.modal}
+          message={this.state.messageToShow}
+        />
+      </Row>
     );
   }
 }
