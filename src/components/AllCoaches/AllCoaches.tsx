@@ -5,6 +5,7 @@ import { gql } from 'apollo-boost';
 
 interface AllCoachesProps {
   email: string;
+  onSelectCoach: Function;
 }
 interface AllCoachesState {
   email: string;
@@ -35,6 +36,8 @@ initCoaches = async () => {
           name
           lastName
           fields
+          district
+          province
         }
       }`  });
     this.setState({
@@ -45,12 +48,17 @@ initCoaches = async () => {
   }
   
   }
+  handleCoach = (coach: any) => {
+  //  console.log('coach ' + coach);
+    this.props.onSelectCoach(coach);
+  }
   render() {
     return (
 
         <div>
         <ShowCardsCoach 
             coaches={this.state.coaches} 
+            onSelectCoach={this.handleCoach}
         />            
         </div>
     );

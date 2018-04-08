@@ -9,7 +9,8 @@ interface CoachCardProps {
     province: string;
     district: string;
     email: string;  
-    fields: string[];    
+    fields: string[];  
+    onSelectCoach: Function;  
 }
 
 export default class CoachCard extends React.Component <CoachCardProps, any > {
@@ -17,8 +18,9 @@ export default class CoachCard extends React.Component <CoachCardProps, any > {
         super(props);
     }
     toggleModal = () => {
-        window.location.href =
-                'http://localhost:3000/coaches?id=' + this.props.email;
+        this.props.onSelectCoach(this.props.email);
+      /*  window.location.href =
+                'http://localhost:3000/coaches?id=' + this.props.email;*/
                 
     }
     render() {

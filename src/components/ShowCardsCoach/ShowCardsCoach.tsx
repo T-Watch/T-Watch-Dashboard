@@ -7,6 +7,7 @@ interface ShowCardsCoachState {
 }
 interface ShowCardsCoachProps {
   coaches: object[];
+  onSelectCoach: Function;
 }
 
 class ShowCardsCoach extends React.Component  <ShowCardsCoachProps, ShowCardsCoachState > {
@@ -16,15 +17,20 @@ class ShowCardsCoach extends React.Component  <ShowCardsCoachProps, ShowCardsCoa
         coaches: this.props.coaches,
     };
 }
-targets = () => {
+
+handleCoach = (coach: any) => {
+  this.props.onSelectCoach(coach);
+  }
+ 
+/*targets = () => {
   this.setState({
     coaches: this.props.coaches
     });  
-}
-  render() {
+}*/
+render() {
     return (
      <div>
-     {this.props.coaches.map(function(coach: any, i: any) {
+     {this.props.coaches.map((coach: any, i: any) => {
        return   <ul key={coach.email}>
        <CoachCard 
         name={coach.name} 
@@ -33,6 +39,7 @@ targets = () => {
         district={coach.district} 
         email={coach.email} 
         fields={coach.fields.toString()}
+        onSelectCoach={this.handleCoach}
        />
        </ul>;
      })}

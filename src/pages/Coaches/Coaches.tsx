@@ -6,6 +6,9 @@ import { Card, AllCoaches } from '../../components';
 import { Coach } from '../../components';
 import MyCoaches from '../../components/MyCoaches/MyCoaches';
 
+import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
+
+
 const query = gql`
 query Query($email: String!) {
   user(email: $email){
@@ -65,7 +68,21 @@ CoachesState> {
     // console.error(e);
   }
   }
-  
+  handleCoach = async(coach: string) => {
+    try {
+    const res = await this.props.client.query({
+      query,
+      variables: {
+        email: coach
+      }
+    });
+    this.setState({coach: res.data.user},
+                  () => console.log(this.state.coach)    );
+    
+  } catch (e) {
+    // console.error(e);
+  }
+  }
 getAge = (birthdayDate: Date) => { // birthday is a date
   var birthday = new Date(birthdayDate);
   var ageDifMs = Date.now() - birthday.getTime();
@@ -73,14 +90,16 @@ getAge = (birthdayDate: Date) => { // birthday is a date
   return Math.abs(ageDate.getUTCFullYear() - 1970);
 }
 
-  render() {
-    if (!this.props.email || !this.state.coach) {
+   render() {
+    
+
+    if (!this.state.coach) {
       return( 
       <div>
       <Row gutter={40}>
           <Col className="gutter-row" span={8}>
             <Card title="All coaches" icon="team" >
-              <AllCoaches/>
+              <AllCoaches onSelectCoach={this.handleCoach}/>
             </Card>
           </Col>
           <Col className="gutter-row" span={8}>
@@ -113,12 +132,12 @@ getAge = (birthdayDate: Date) => { // birthday is a date
     <Row gutter={40}>
         <Col className="gutter-row" span={8}>
           <Card title="All coaches" icon="team" >
-            <AllCoaches/>
+          <AllCoaches onSelectCoach={this.handleCoach}/>
           </Card>
         </Col>
         <Col className="gutter-row" span={8}>
           <Card title="Coach" icon="user" > 
-          {this.props.email ?
+          {this.state.coach ?
             <Coach 
               email={email} 
               name={names} 
