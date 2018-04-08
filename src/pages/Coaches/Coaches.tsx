@@ -109,8 +109,7 @@ getAge = (birthdayDate: Date) => { // birthday is a date
           </Col>
           <Col className="gutter-row" span={8}>
             <Card title="My coaches" icon="star" >
-              <p style={{textAlign: 'center'}}>Any coach yet</p>
-              <p style={{textAlign: 'center'}}>What do you waiting for?</p>
+            <MyCoaches/>
             </Card>
           </Col>
         </Row>

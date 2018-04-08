@@ -41,13 +41,12 @@ CoachesState> {
     }
     try {
     const { data } = await this.props.client.query({
-      query,
+      query: query,
       variables: {
-        email: this.props.coach
+        coach: this.props.coach
       }
     });
     const plans = data.plans;
-   // console.log(plans);
 
     for (var i = 0; i < plans.length; i++) {
         if (plans[i].type === 'BASIC') {

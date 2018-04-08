@@ -97,7 +97,7 @@ async getCoach() {
         <div>
           {this.state.planId === '' ?
           <div>
-          <p style={{textAlign: 'center'}}>Any coach yet</p>
+          <p style={{textAlign: 'center'}}>Any  yet</p>
           <p style={{textAlign: 'center'}}>What do you waiting for?</p>
           </div>
           :  
