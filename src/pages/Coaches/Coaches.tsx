@@ -6,9 +6,6 @@ import { Card, AllCoaches } from '../../components';
 import { Coach } from '../../components';
 import MyCoaches from '../../components/MyCoaches/MyCoaches';
 
-import { BrowserRouter as Router, Route, Link } from 'react-router-dom';
-
-
 const query = gql`
 query Query($email: String!) {
   user(email: $email){
@@ -92,7 +89,6 @@ getAge = (birthdayDate: Date) => { // birthday is a date
 
    render() {
     
-
     if (!this.state.coach) {
       return( 
       <div>
@@ -116,6 +112,7 @@ getAge = (birthdayDate: Date) => { // birthday is a date
     </div>
     );
     }
+
     const data = {user: this.state.coach};
     const names = (data as any).user.name;
     const lastName = (data as any).user.lastName;

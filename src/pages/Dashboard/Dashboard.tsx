@@ -52,7 +52,7 @@ class Dashboard extends React.Component<{}, State> {
 
     return (
       <Row gutter={40}>
-        <Col className="gutter-row" span={8}>
+        <Col className="gutter-row" span={12}>
           <Card title="Inbox" icon="inbox" >
             <Query
               query={query}
@@ -107,18 +107,18 @@ class Dashboard extends React.Component<{}, State> {
             </Query>
           </Card>
         </Col>
-        <Col className="gutter-row" span={8}>
+        <Col className="gutter-row" span={12}>
           <Card title="Last training" icon="line-chart" >
             <TrainingSummary {...lastTraining} />
           </Card>
         </Col>
-        <Col className="gutter-row" span={8}>
+        {/*<Col className="gutter-row" span={8}>
           <Card title="inbox" icon="inbox" >
             <p>Card content</p>
             <p>Card content</p>
             <p>Card content</p>
           </Card>
-        </Col>
+            </Col>*/}
         <MessageModal
           onCancel={() => this.setState({ modal: false })}
           visible={this.state.modal}
