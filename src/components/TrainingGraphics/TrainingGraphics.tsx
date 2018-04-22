@@ -17,7 +17,7 @@ class TrainingGraphics extends React.Component<any, TrainingGraphicsProps> {
     }
     return (        
     <div>
-    <Card title="HR - speed">
+    <Card title="HR - Speed">
         <ScatterChart width={300} height={300} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
             <XAxis dataKey={'HR'} type="number" name="HR" unit="bpm"/>
             <YAxis dataKey={'speed'} type="number" name="speed" unit="km/h"/>
@@ -26,7 +26,7 @@ class TrainingGraphics extends React.Component<any, TrainingGraphicsProps> {
             <Tooltip cursor={{strokeDasharray: '3 3'}}/>
         </ScatterChart>
     </Card>
-    <Card title="HR2 - speed">
+   {/*} <Card title="HR2 - speed">
         <ScatterChart width={300} height={300} margin={{top: 20, right: 20, bottom: 20, left: 20}}>
             <XAxis dataKey={'HR'} type="number" name="HR" unit="bpm"/>
             <YAxis dataKey={'speed'} type="number" name="speed" unit="km/h"/>
@@ -34,7 +34,7 @@ class TrainingGraphics extends React.Component<any, TrainingGraphicsProps> {
             <Scatter name="HR - speed" data={HRspeed} fill="#8884d8"/>
             <Tooltip cursor={{strokeDasharray: '3 3'}}/>
         </ScatterChart>
-    </Card>
+    </Card>*/}
     
     </div>   
     );

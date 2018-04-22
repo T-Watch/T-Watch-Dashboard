@@ -25,6 +25,13 @@ class ShowCardsUsers extends React.Component  <ShowCardsProps, any > {
          province={user.province}
          district={user.district}
          dueDate={user.plan.dueDate}
+         birthday={user.birthday}
+         gender={user.gender}
+         weight={user.weight}
+         height={user.height}
+         diseases={user.diseases}
+         allergies={user.allergies}
+         surgeries={user.surgeries}
         />
        </ul>);
      })}

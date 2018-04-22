@@ -85,7 +85,9 @@ class App extends React.Component<ApolloProps, State> {
           localStorage.removeItem('token');
           localStorage.removeItem('email');
           localStorage.removeItem('type');
-          return <Login redirect={() => router.history.replace('/dashboard')} />;
+          return window.location.href =
+          'http://localhost:3005';
+          // return <Login redirect={() => router.history.replace('/dashboard')} />;
         default:
           break;
       }

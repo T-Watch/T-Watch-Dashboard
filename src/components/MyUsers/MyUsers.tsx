@@ -19,7 +19,14 @@ query Query($coach: String) {
     email
     province
     district
+    birthday
+    gender
     ...on User{
+      weight
+      height
+      diseases
+      allergies
+      surgeries
       plan{
         plan
         dueDate
