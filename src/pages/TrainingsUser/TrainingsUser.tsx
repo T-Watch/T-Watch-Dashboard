@@ -118,7 +118,7 @@ class TrainingsUser extends React.Component<ApolloProps, TrainingsUserState> {
                     </Card>
 
                   </Col>
-                  <Col span={12}>
+                  <Col span={16}>
                   {this.state.training ?                  
                   <Card 
                     title={'Last Training  ' + trainingDate.getDate() + '-' + 
