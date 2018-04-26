@@ -71,7 +71,7 @@ class TrainingBlockModal extends React.Component<Props & InnerProps, State> {
           </FormItem>
           <FormItem label="Duration">
             {getFieldDecorator('duration', { initialValue: tBlock.duration || undefined })(
-              <InputNumber placeholder="Minutes" min={0} step={0.1} />
+              <InputNumber placeholder="Seconds" min={0} step={0.1} />
             )}
           </FormItem>
           <FormItem label="Max HR">
