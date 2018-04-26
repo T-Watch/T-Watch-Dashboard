@@ -53,7 +53,7 @@ class TrainingSummary extends React.Component<TrainingSummaryProps, {}> {
           <ResponsiveContainer width="100%" height={100}>
             <LineChart data={this.props.data}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="amt" />
+              <XAxis dataKey="amt" name="HR" unit="bpm"/>
               <Line type="monotone" dataKey="pv" stroke="#4286f4" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
